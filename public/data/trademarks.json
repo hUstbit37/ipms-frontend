@@ -1,0 +1,212 @@
+[
+  {
+    "id": 1,
+    "logo": "/logos/hari-hari.png",
+    "name": "HARI HARI",
+    "application_number": "VN-4-2025-40751",
+    "application_date": "12.06.2025",
+    "publication_date": "27.10.2025",
+    "status": "Đang giải quyết",
+    "applicant": "Công ty cổ phần hàng tiêu dùng MASAN",
+    "classes": "26, 30, 32"
+  },
+  {
+    "id": 2,
+    "logo": "/logos/hari-hari-corsica.png",
+    "name": "HARI HARI Corsica",
+    "application_number": "VN-4-2025-40760",
+    "application_date": "12.06.2025",
+    "publication_date": "27.10.2025",
+    "status": "Đang giải quyết",
+    "applicant": "Công ty cổ phần hàng tiêu dùng MASAN",
+    "classes": "3"
+  },
+  {
+    "id": 3,
+    "logo": "/logos/chante-active.png",
+    "name": "CHANTÉ ACTIVE",
+    "application_number": "VN-4-2025-31754",
+    "application_date": "02.07.2025",
+    "publication_date": "26.09.2025",
+    "status": "Đang giải quyết",
+    "applicant": "Công ty cổ phần hàng tiêu dùng MASAN",
+    "classes": "3"
+  },
+  {
+    "id": 4,
+    "logo": "/logos/nam-ngu.png",
+    "name": "NAM NGƯ",
+    "application_number": "VN-4-2025-10066",
+    "application_date": "14.03.2025",
+    "publication_date": "26.09.2025",
+    "status": "Đang giải quyết",
+    "applicant": "CÔNG TY CỔ PHẦN HÀNG TIÊU DÙNG MASAN",
+    "classes": "29, 30"
+  },
+  {
+    "id": 5,
+    "logo": "/logos/nam-ngu-de-nhi.png",
+    "name": "NAM NGƯ ĐẾ NHÍ",
+    "application_number": "VN-4-2025-10084",
+    "application_date": "14.03.2025",
+    "publication_date": "26.09.2025",
+    "status": "Đang giải quyết",
+    "applicant": "CÔNG TY CỔ PHẦN HÀNG TIÊU DÙNG MASAN",
+    "classes": "29, 30"
+  },
+  {
+    "id": 6,
+    "logo": "/logos/tam-thai-tu.png",
+    "name": "TAM THÁI TỬ",
+    "application_number": "VN-4-2025-10083",
+    "application_date": "14.03.2025",
+    "publication_date": "26.09.2025",
+    "status": "Đang giải quyết",
+    "applicant": "CÔNG TY CỔ PHẦN HÀNG TIÊU DÙNG MASAN",
+    "classes": "30"
+  },
+  {
+    "id": 7,
+    "logo": "/logos/omachi.png",
+    "name": "OMACHI",
+    "application_number": "VN-4-2025-10082",
+    "application_date": "14.03.2025",
+    "publication_date": "26.09.2025",
+    "status": "Đang giải quyết",
+    "applicant": "CÔNG TY CỔ PHẦN HÀNG TIÊU DÙNG MASAN",
+    "classes": "30"
+  },
+  {
+    "id": 8,
+    "logo": "/logos/chin-su.png",
+    "name": "CHIN-SU",
+    "application_number": "VN-4-2024-61644",
+    "application_date": "19.12.2024",
+    "publication_date": "25.04.2025",
+    "status": "Đang giải quyết",
+    "applicant": "Công ty cổ phần hàng tiêu dùng MASAN",
+    "classes": "29, 30"
+  },
+  {
+    "id": 9,
+    "logo": "/logos/pho-story.png",
+    "name": "Phở Story",
+    "application_number": "VN-4-2024-61643",
+    "application_date": "19.12.2024",
+    "publication_date": "25.04.2025",
+    "status": "Đang giải quyết",
+    "applicant": "Công ty cổ phần hàng tiêu dùng MASAN",
+    "classes": "30"
+  },
+  {
+    "id": 10,
+    "logo": "/logos/chin-su.png",
+    "name": "CHIN-SU",
+    "application_number": "VN-4-2024-61642",
+    "application_date": "19.12.2024",
+    "publication_date": "25.04.2025",
+    "status": "Đang giải quyết",
+    "applicant": "Công ty cổ phần hàng tiêu dùng MASAN",
+    "classes": "29, 30"
+  },
+  {
+    "id": 11,
+    "logo": "/logos/meganut.png",
+    "name": "megaNut CHA/EN ĐẠI HẠT",
+    "application_number": "VN-4-2024-42919",
+    "application_date": "13.01.2023",
+    "publication_date": "25.04.2025",
+    "status": "Đang giải quyết",
+    "applicant": "CÔNG TY CỔ PHẦN HÀNG TIÊU DÙNG MASAN",
+    "classes": "30"
+  },
+  {
+    "id": 12,
+    "logo": "/logos/tam-thai-tu-dong-tien.png",
+    "name": "TAM THÁI TỬ ĐỒNG TIÊN",
+    "application_number": "VN-4-2024-41391",
+    "application_date": "18.09.2024",
+    "publication_date": "25.04.2025",
+    "status": "Đang giải quyết",
+    "applicant": "Công ty cổ phần hàng tiêu dùng Masan",
+    "classes": "30"
+  },
+  {
+    "id": 13,
+    "logo": "/logos/santoso.png",
+    "name": "Santoso SÁCH ĐỂ THỎI THƠ BOTANICALS (Bamboos)",
+    "application_number": "VN-4-2024-42642",
+    "application_date": "11.09.2024",
+    "publication_date": "25.04.2025",
+    "status": "Đang giải quyết",
+    "applicant": "Công ty cổ phần hàng tiêu dùng MASAN",
+    "classes": "3"
+  },
+  {
+    "id": 14,
+    "logo": "/logos/gumi.png",
+    "name": "GUMI",
+    "application_number": "VN-4-2024-42930",
+    "application_date": "10.09.2024",
+    "publication_date": "25.04.2025",
+    "status": "Đang giải quyết",
+    "applicant": "Công ty cổ phần hàng tiêu dùng MASAN",
+    "classes": "29"
+  },
+  {
+    "id": 15,
+    "logo": "/logos/gumi.png",
+    "name": "GUMI",
+    "application_number": "VN-4-2024-42929",
+    "application_date": "10.09.2024",
+    "publication_date": "25.04.2025",
+    "status": "Đang giải quyết",
+    "applicant": "Công ty cổ phần hàng tiêu dùng MASAN",
+    "classes": "30"
+  },
+  {
+    "id": 16,
+    "logo": "/logos/chante.png",
+    "name": "CHANTÉ",
+    "application_number": "VN-4-2024-40858",
+    "application_date": "28.08.2024",
+    "publication_date": "25.04.2025",
+    "status": "Đang giải quyết",
+    "applicant": "Công ty cổ phần hàng tiêu dùng MASAN",
+    "classes": "37"
+  },
+  {
+    "id": 17,
+    "logo": "/logos/chante-parfumee.png",
+    "name": "Chanté Parfumée à la rose française",
+    "application_number": "VN-4-2024-40857",
+    "application_date": "28.08.2024",
+    "publication_date": "25.04.2025",
+    "status": "Đang giải quyết",
+    "applicant": "Công ty cổ phần hàng tiêu dùng MASAN",
+    "classes": "37"
+  },
+  {
+    "id": 18,
+    "logo": "/logos/gumi.png",
+    "name": "GUMI",
+    "application_number": "VN-4-2024-38494",
+    "application_date": "15.08.2024",
+    "publication_date": "25.04.2025",
+    "status": "Đang giải quyết",
+    "applicant": "Công ty cổ phần hàng tiêu dùng MASAN",
+    "classes": "30"
+  },
+  {
+    "id": 19,
+    "logo": "/logos/gumi.png",
+    "name": "GUMI",
+    "application_number": "VN-4-2024-38493",
+    "application_date": "15.08.2024",
+    "publication_date": "25.04.2025",
+    "status": "Đang giải quyết",
+    "applicant": "Công ty cổ phần hàng tiêu dùng MASAN",
+    "classes": "29"
+  }
+  
+]

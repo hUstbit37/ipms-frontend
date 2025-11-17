@@ -1,36 +1,106 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Admin Dashboard
+
+A modern, clean admin dashboard built with Next.js 14, TypeScript, Tailwind CSS, and shadcn/ui.
+
+## Tech Stack
+
+- **Next.js 14+** - React framework with App Router
+- **TypeScript** - Type-safe development
+- **Tailwind CSS** - Utility-first CSS framework
+- **shadcn/ui** - Beautiful, accessible UI components
+- **TanStack Query** - Powerful data fetching and caching
+- **next-themes** - Dark mode support
+- **Lucide React** - Modern icon library
+
+## Features
+
+- ✨ Modern, clean design
+- 🎨 Dark mode support
+- 📱 Responsive layout with mobile-friendly sidebar
+- 🧩 Modular component structure
+- 🎯 Type-safe with TypeScript
+- 🚀 Optimized performance
 
 ## Getting Started
 
-First, run the development server:
+### Installation
+
+```bash
+npm install
+```
+
+### Development
+
+Run the development server:
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### Build
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+npm run build
+```
 
-## Learn More
+### Production
 
-To learn more about Next.js, take a look at the following resources:
+```bash
+npm start
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Project Structure
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+```
+src/
+├── app/                 # Next.js app router pages
+│   ├── layout.tsx      # Root layout with providers
+│   └── page.tsx        # Dashboard page
+├── components/         # React components
+│   ├── ui/            # shadcn/ui components
+│   ├── header.tsx     # Top header with search and user menu
+│   ├── sidebar.tsx    # Navigation sidebar
+│   ├── theme-provider.tsx
+│   ├── theme-toggle.tsx
+│   └── providers.tsx  # TanStack Query provider
+└── lib/
+    └── utils.ts       # Utility functions
+```
+
+## Customization
+
+### Adding New Pages
+
+Create new pages in the `src/app` directory following Next.js App Router conventions.
+
+### Adding Navigation Items
+
+Edit the `menuItems` array in `src/components/sidebar.tsx`:
+
+```typescript
+const menuItems = [
+  {
+    title: "Your Page",
+    href: "/your-page",
+    icon: YourIcon,
+  },
+  // ...
+]
+```
+
+### Theme Customization
+
+Modify colors in `src/app/globals.css` or use the shadcn/ui theme customization.
 
 ## Deploy on Vercel
 
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Check out the [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+
+## License
+
+MIT
+
