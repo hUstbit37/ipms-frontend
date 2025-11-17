@@ -133,7 +133,7 @@ export function Sidebar() {
                         </>
                       )}
                     </Button>
-                    {!isCollapsed && isOpen && (
+                    {!isCollapsed && isOpen && item.children && (
                       <div className="ml-4 mt-1 space-y-1">
                         {item.children.map((child) => {
                           const ChildIcon = child.icon
