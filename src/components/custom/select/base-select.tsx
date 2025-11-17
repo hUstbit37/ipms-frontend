@@ -1,5 +1,5 @@
 import React from 'react';
-import Select, { Props as SelectProps, StylesConfig, ActionMeta } from 'react-select';
+import Select, { Props as SelectProps, StylesConfig, ActionMeta, GroupBase } from 'react-select';
 import { cn } from '@/lib/utils';
 
 export interface SelectOption {
@@ -8,7 +8,7 @@ export interface SelectOption {
     [key: string]: unknown;
 }
 
-export interface BaseSelectProps extends Omit<SelectProps, 'onChange' | 'value'> {
+export interface BaseSelectProps extends Omit<SelectProps<SelectOption, boolean>, 'onChange' | 'value' | 'styles'> {
     options: SelectOption[];
     value?: SelectOption | SelectOption[] | null;
     onChange?: (value: SelectOption | SelectOption[] | null, actionMeta?: ActionMeta<SelectOption>) => void;
@@ -52,7 +52,7 @@ const BaseSelect: React.FC<BaseSelectProps> = ({
     };
 
     // Custom styles
-    const customStyles: StylesConfig<SelectOption, boolean> = {
+    const customStyles: StylesConfig<SelectOption, boolean, GroupBase<SelectOption>> = {
         control: (provided, state) => ({
             ...provided,
             ...sizeStyles[size].control,
