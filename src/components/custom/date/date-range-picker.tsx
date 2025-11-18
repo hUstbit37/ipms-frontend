@@ -158,7 +158,7 @@ export function DateRangePicker({
                 format(date.from, dateFormat)
               )
             ) : (
-              <span>{placeholder}</span>
+              <span className="text-muted-foreground">{placeholder}</span>
             )}
           </Button>
         </PopoverTrigger>
