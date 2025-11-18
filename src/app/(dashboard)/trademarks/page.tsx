@@ -121,6 +121,7 @@ export default function TrademarksPage() {
                   placeholder="Select status..."
                 /> */}
                 <SingleSelect
+                  instanceId="trademark-status-select"
                   isClearable
                   options={statusOptions}
                   value={statusOptions.find(b => b.value === data.status.toString()) ? {
