@@ -6,7 +6,7 @@ import { Badge } from "@/components/ui/badge"
 import { Input } from "@/components/ui/input"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Switch } from "@/components/ui/switch"
-import { Plus, Search, Filter, Download, Eye, Pencil, Trash2, MoreHorizontal, RotateCcw, ChevronLeft, ChevronRight } from "lucide-react"
+import { Plus, Search, Filter, Download, Eye, Pencil, Trash2, MoreHorizontal, RotateCcw, ChevronLeft, ChevronRight, ChevronDown } from "lucide-react"
 import {
   Table,
   TableBody,
@@ -475,6 +475,37 @@ export default function TrademarksPage() {
       {/* Table Card */}
       <Card>
         <CardContent>
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 mb-4">
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" size="default" className="gap-2">
+                  <ChevronDown className="h-4 w-4" />
+                  Thao tác
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="start">
+                <DropdownMenuLabel>Thao tác hàng loạt</DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem>
+                  <Download className="mr-2 h-4 w-4" />
+                  Xuất dữ liệu
+                </DropdownMenuItem>
+                <DropdownMenuItem>
+                  <Pencil className="mr-2 h-4 w-4" />
+                  Cập nhật hàng loạt
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem className="text-destructive">
+                  <Trash2 className="mr-2 h-4 w-4" />
+                  Xóa đã chọn
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+            <Button variant="default" size="default" className="gap-2">
+              <Plus className="h-4 w-4" />
+              Tạo mới
+            </Button>
+          </div>
           <Table>
             <TableHeader>
               <TableRow>
@@ -583,7 +614,7 @@ export default function TrademarksPage() {
               )))}
             </TableBody>
           </Table>
-
+              
           {/* Pagination */}
           {!isLoading && !error && allTrademarks.length > 0 && (
             <div className="flex items-center justify-between px-2 py-4">
