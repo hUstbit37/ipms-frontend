@@ -30,52 +30,52 @@ import { useQuery } from "@tanstack/react-query"
 import { Label } from "@/components/ui/label"
 import SingleSelect from "@/components/custom/select/single-select"
 import { DateRangePicker } from "@/components/custom/date/date-range-picker"
-import { useRouter } from "next/navigation"
 
-type Trademark = {
+interface Patent {
   id: number
-  logo: string
+  code: string
   name: string
+  country_code: string
   application_number: string
   application_date: string
   publication_date: string
-  status: string
   applicant: string
+  agency: string
+  status: string
   classes: string
 }
 
-const fetchTrademarks = async (): Promise<Trademark[]> => {
-  const response = await fetch('/data/trademarks.json')
+const fetchData = async (): Promise<Patent[]> => {
+  const response = await fetch('/data/patents.json')
   if (!response.ok) {
-    throw new Error('Failed to fetch trademarks')
+    throw new Error('Failed to fetch patents data')
   }
   return response.json()
 }
 
-export default function TrademarksPage() {
+export default function PatentsPage() {
   const { setBreadcrumbs } = useBreadcrumbs()
-  const router = useRouter()
   const [currentPage, setCurrentPage] = useState(1)
   const itemsPerPage = 10
 
-  const { data: allTrademarks = [], isLoading, error } = useQuery({
-    queryKey: ['trademarks'],
-    queryFn: fetchTrademarks,
+  const { data: allRecords = [], isLoading, error } = useQuery({
+    queryKey: ['patents'],
+    queryFn: fetchData,
   })
   
   useEffect(() => {
     setBreadcrumbs([
       { label: "Dashboard", href: "/" },
-      { label: "Nhãn hiệu", href: "/trademarks" },
+      { label: "Giải pháp hữu ích", href: "/utility-solutions" },
       { label: "Danh sách" }
     ])
   }, [setBreadcrumbs])
 
   // Pagination logic
-  const totalPages = Math.ceil(allTrademarks.length / itemsPerPage)
+  const totalPages = Math.ceil(allRecords.length / itemsPerPage)
   const startIndex = (currentPage - 1) * itemsPerPage
   const endIndex = startIndex + itemsPerPage
-  const currentTrademarks = allTrademarks.slice(startIndex, endIndex)
+  const currentRecords = allRecords.slice(startIndex, endIndex)
 
   const goToNextPage = () => {
     setCurrentPage((prev) => Math.min(prev + 1, totalPages))
@@ -128,14 +128,13 @@ export default function TrademarksPage() {
     expiry_date_to: '',
     // Chủ thể
     applicant: '',
-    representative: '',
+    agency: '',
     // Trạng thái
-    legal_status: '',
-    workflow_status: '',
+    status: '', //trạng thái pháp lý
+    workflow_status: '', //trạng thái nội bộ
     // Phân loại
-    nice_class: '',
-    goods_services: '',
-    vienna_class: '',
+    locarno_class: '',
+    country_code: '',
   })
 
   const [showAdvancedSearch, setShowAdvancedSearch] = useState(false)
@@ -183,11 +182,11 @@ export default function TrademarksPage() {
                 {/* <h3 className="text-sm font-semibold mb-3">Thông tin cơ bản</h3> */}
                 <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-3">
                   <div>
-                    <Label htmlFor="trademark_name">Nhãn hiệu</Label>
+                    <Label htmlFor="name">Tên</Label>
                     <Input
-                      id="trademark_name"
+                      id="name"
                       type="text"
-                      placeholder="Nhãn hiệu..."
+                      placeholder="Tên..."
                       value={data.name}
                       onChange={(e) => setData({ ...data, name: e.target.value })}
                     />
@@ -361,8 +360,8 @@ export default function TrademarksPage() {
                       id="representative"
                       type="text"
                       placeholder="Đại diện..."
-                      value={data.representative}
-                      onChange={(e) => setData({ ...data, representative: e.target.value })}
+                      value={data.agency}
+                      onChange={(e) => setData({ ...data, agency: e.target.value })}
                     />
                   </div>
                 </div>
@@ -373,18 +372,18 @@ export default function TrademarksPage() {
                 {/* <h3 className="text-sm font-semibold mb-3">Trạng thái</h3> */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                   <div>
-                    <Label htmlFor="legal_status">Trạng thái pháp lý</Label>
+                    <Label htmlFor="status">Trạng thái pháp lý</Label>
                     <SingleSelect
                       instanceId="legal-status-select"
                       isClearable
                       options={statusOptions}
-                      value={statusOptions.find(b => b.value === data.legal_status) ? {
-                        value: data.legal_status,
-                        label: statusOptions.find(b => b.value === data.legal_status)?.label || ''
+                      value={statusOptions.find(b => b.value === data.status) ? {
+                        value: data.status,
+                        label: statusOptions.find(b => b.value === data.status)?.label || ''
                       } : null}
                       onChange={(selected) => setData({
                         ...data,
-                        legal_status: selected ? selected.value as string : ''
+                        status: selected ? selected.value as string : ''
                       })}
                       placeholder="Trạng thái pháp lý"
                     />
@@ -414,40 +413,23 @@ export default function TrademarksPage() {
                 {/* <h3 className="text-sm font-semibold mb-3">Phân loại</h3> */}
                 <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3">
                   <div>
-                    <Label htmlFor="nice_class">Nice Class</Label>
-                    <SingleSelect
-                      instanceId="nice-class-select"
-                      isClearable
-                      options={niceClassOptions}
-                      value={niceClassOptions.find(b => b.value === data.nice_class) ? {
-                        value: data.nice_class,
-                        label: niceClassOptions.find(b => b.value === data.nice_class)?.label || ''
-                      } : null}
-                      onChange={(selected) => setData({
-                        ...data,
-                        nice_class: selected ? selected.value as string : ''
-                      })}
-                      placeholder="Nice Class"
+                    <Label htmlFor="locarno_class">Locarno Class</Label>
+                    <Input
+                      id="locarno_class"
+                      type="text"
+                      placeholder="Locarno Class..."
+                      value={data.locarno_class}
+                      onChange={(e) => setData({ ...data, locarno_class: e.target.value })}
                     />
                   </div>
                   <div>
-                    <Label htmlFor="goods_services">Tên hàng hóa</Label>
+                    <Label htmlFor="country">Quốc gia</Label>
                     <Input
-                      id="goods_services"
+                      id="country"
                       type="text"
-                      placeholder="Tên hàng hóa..."
-                      value={data.goods_services}
-                      onChange={(e) => setData({ ...data, goods_services: e.target.value })}
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="vienna_class">Vienna Class</Label>
-                    <Input
-                      id="vienna_class"
-                      type="text"
-                      placeholder="Vienna Class..."
-                      value={data.vienna_class}
-                      onChange={(e) => setData({ ...data, vienna_class: e.target.value })}
+                      placeholder="Quốc gia..."
+                      value={data.country_code}
+                      onChange={(e) => setData({ ...data, country_code: e.target.value })}
                     />
                   </div>
                 </div>
@@ -503,12 +485,7 @@ export default function TrademarksPage() {
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
-            <Button 
-              variant="default" 
-              size="default" 
-              className="gap-2"
-              onClick={() => router.push('/trademarks/create')}
-            >
+            <Button variant="default" size="default" className="gap-2">
               <Plus className="h-4 w-4" />
               Tạo mới
             </Button>
@@ -519,15 +496,14 @@ export default function TrademarksPage() {
                 <TableHead className="w-[50px]">
                   <Checkbox />
                 </TableHead>
-                <TableHead className="w-[120px]">Mẫu nhãn</TableHead>
-                <TableHead>Nhãn hiệu</TableHead>
-                <TableHead className="min-w-[120px]">Số đơn</TableHead>
+                <TableHead>Tên</TableHead>
+                <TableHead>Số đơn</TableHead>
                 <TableHead>Ngày nộp đơn</TableHead>
-                <TableHead>Ngày công bố</TableHead>
                 <TableHead>Số bằng</TableHead>
                 <TableHead>Ngày cấp</TableHead>
-                <TableHead>Nhóm sản phẩm/dịch vụ</TableHead>
+                <TableHead>Nhóm phân loại</TableHead>
                 <TableHead>Chủ đơn/Chủ bằng</TableHead>
+                <TableHead>Đại diện</TableHead>
                 <TableHead>Trạng thái</TableHead>
                 <TableHead className="text-right">Thao tác</TableHead>
               </TableRow>
@@ -542,39 +518,30 @@ export default function TrademarksPage() {
               ) : error ? (
                 <TableRow>
                   <TableCell colSpan={12} className="text-center py-8 text-destructive">
-                    Lỗi khi tải dữ liệu
+                    {/* Lỗi khi tải dữ liệu */}
+                    Không có dữ liệu
                   </TableCell>
                 </TableRow>
-              ) : currentTrademarks.length === 0 ? (
+              ) : currentRecords.length === 0 ? (
                 <TableRow>
                   <TableCell colSpan={12} className="text-center py-8">
                     Không có dữ liệu
                   </TableCell>
                 </TableRow>
               ) : (
-                currentTrademarks.map((trademark) => (
-                <TableRow key={trademark.id}>
+                currentRecords.map((item) => (
+                <TableRow key={item.id}>
                   <TableCell>
                     <Checkbox />
                   </TableCell>
-                  <TableCell>
-                    <div className="flex h-16 w-16 items-center justify-center rounded border bg-white p-2">
-                      <div className="text-center text-xs font-bold text-primary">
-                        {trademark.name.split(" ")[0]}
-                      </div>
-                    </div>
-                  </TableCell>
                   <TableCell className="font-medium">
-                    {trademark.name}
+                    {item.name}
                   </TableCell>
                   <TableCell className="text-sm">
-                    {trademark.application_number}
+                    {item.application_number}
                   </TableCell>
                   <TableCell className="text-sm">
-                    {trademark.application_date}
-                  </TableCell>
-                  <TableCell className="text-sm">
-                    {trademark.publication_date}
+                    {item.application_date}
                   </TableCell>
                   <TableCell className="text-sm">
                     -
@@ -583,13 +550,16 @@ export default function TrademarksPage() {
                     -
                   </TableCell>
                   <TableCell className="text-sm">
-                    {trademark.classes}
+                    {item.classes}
                   </TableCell>
                   <TableCell className="  text-sm">
-                    {trademark.applicant}
+                    {item.applicant}
+                  </TableCell>
+                  <TableCell className="  text-sm">
+                    {item.agency}
                   </TableCell>
                   <TableCell>
-                    <Badge variant="secondary">{trademark.status}</Badge>
+                    <Badge variant="secondary">{item.status}</Badge>
                   </TableCell>
                   <TableCell className="text-right">
                     <DropdownMenu>
@@ -623,10 +593,10 @@ export default function TrademarksPage() {
           </Table>
               
           {/* Pagination */}
-          {!isLoading && !error && allTrademarks.length > 0 && (
+          {!isLoading && !error && allRecords.length > 0 && (
             <div className="flex items-center justify-between px-2 py-4">
               <div className="text-sm text-muted-foreground">
-                Hiển thị {startIndex + 1} - {Math.min(endIndex, allTrademarks.length)} của {allTrademarks.length} kết quả
+                Hiển thị {startIndex + 1} - {Math.min(endIndex, allRecords.length)} của {allRecords.length} kết quả
               </div>
               <div className="flex items-center gap-2">
                 <Button

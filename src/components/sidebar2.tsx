@@ -1,5 +1,4 @@
 "use client";
-import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
@@ -11,7 +10,6 @@ import {
 	FolderKanban,
 	ChevronLeft,
 	ChevronRight,
-	FileText,
 	Calendar,
 	Database,
 	MessageSquare,
@@ -19,6 +17,13 @@ import {
 	HelpCircle,
 	LogIn,
 	AlertCircle,
+	Tag,
+	Palette,
+	Lightbulb,
+	Wrench,
+	MapPin,
+	Copyright,
+	Globe,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useSidebar } from "@/components/sidebar-context"
@@ -39,20 +44,40 @@ const sidebarGroups = [
 		title: "SHTT",
 		items: [
 			{
-        title: "Nhãn hiệu",
-        href: "/trademarks",
-        icon: FileText,
-      },
-      {
-        title: "Kiểu dáng",
-        href: "/industrial-designs",
-        icon: FileText,
-      },
-      {
-        title: "Sáng chế",
-        href: "/patents",
-        icon: FileText,
-      },
+				title: "Nhãn hiệu",
+				href: "/trademarks",
+				icon: Tag,
+			},
+			{
+				title: "Kiểu dáng",
+				href: "/industrial-designs",
+				icon: Palette,
+			},
+			{
+				title: "Sáng chế",
+				href: "/patents",
+				icon: Lightbulb,
+			},
+			{
+				title: "Giải pháp hữu ích",
+				href: "/utility-solutions",
+				icon: Wrench,
+			},
+			{
+				title: "Chỉ dẫn địa lý",
+				href: "/geographical-indications",
+				icon: MapPin,
+			},
+			{
+				title: "Quyền tác giả",
+				href: "/copyrights",
+				icon: Copyright,
+			},
+			{
+				title: "Tên miền",
+				href: "/domains",
+				icon: Globe,
+			},
 		],
 	},
 ];
