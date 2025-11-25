@@ -33,13 +33,13 @@ import { DateRangePicker } from "@/components/custom/date/date-range-picker"
 import { useRouter } from "next/navigation"
 import ImageShowList from "@/components/custom/image/image-show-list"
 
-type Patent = {
+type GeographicalIndication = {
   id: number
   code: string
   logo: string
-  name: string
-  origin_country: string // Quốc gia đơn gốc
-  country: string // Quốc gia bảo hộ (chính là quốc gia trong mỗi bản ghi)
+  name: string // tên chỉ dẫn địa lý
+  geographic_area: string // chỉ dẫn địa lý
+  product: string // sản phẩm
   applicant: string // Chủ đơn
   application_number: string
   application_date: string
@@ -47,32 +47,31 @@ type Patent = {
   status: string //trạng thái pháp lý
   agency: string // Đại diện
   commercial_status: string //trạng thái thương mại
-  ipc_class: string
 }
 
-const fetchRecords = async (): Promise<Patent[]> => {
-  const response = await fetch('/data/patents.json')
+const fetchRecords = async (): Promise<GeographicalIndication[]> => {
+  const response = await fetch('/data/geographical-indications.json')
   if (!response.ok) {
     throw new Error('Failed to fetch data')
   }
   return response.json()
 }
 
-export default function PatentsPage() {
+export default function GeographicalIndicationsPage() {
   const { setBreadcrumbs } = useBreadcrumbs()
   const router = useRouter()
   const [currentPage, setCurrentPage] = useState(1)
   const itemsPerPage = 10
 
   const { data: allRecords = [], isLoading, error } = useQuery({
-    queryKey: ['patents'],
+    queryKey: ['geographical-indications'],
     queryFn: fetchRecords,
   })
   
   useEffect(() => {
     setBreadcrumbs([
       { label: "Dashboard", href: "/" },
-      { label: "Sáng chế", href: "/patents" },
+      { label: "Chỉ dẫn địa lý", href: "/geographical-indications" },
       { label: "Danh sách" }
     ])
   }, [setBreadcrumbs])
@@ -91,7 +90,6 @@ export default function PatentsPage() {
     setCurrentPage((prev) => Math.max(prev - 1, 1))
   }
 
-  const [selectedStatus, setSelectedStatus] = useState<string>('')
   const statusOptions = [
     { label: 'Đã nộp đơn', value: 'filed' },
     { label: 'Từ chối hình thức', value: 'formal_refused' },
@@ -136,41 +134,6 @@ export default function PatentsPage() {
   const searchStatusOptions = [
     { label: 'Đã tra cứu', value: 'searched' },
     { label: 'Chưa tra cứu', value: 'not_searched' },
-  ]
-
-  const locarnoClassOptions = [
-    { label: 'Lớp 01 - Thực phẩm', value: '01' },
-    { label: 'Lớp 02 - Quần áo và phụ kiện may mặc', value: '02' },
-    { label: 'Lớp 03 - Đồ du lịch, hộp đựng, ô dù', value: '03' },
-    { label: 'Lớp 04 - Bàn chải', value: '04' },
-    { label: 'Lớp 05 - Dệt may, tấm vải nhân tạo', value: '05' },
-    { label: 'Lớp 06 - Đồ nội thất', value: '06' },
-    { label: 'Lớp 07 - Đồ gia dụng', value: '07' },
-    { label: 'Lớp 08 - Dụng cụ và thiết bị thủ công', value: '08' },
-    { label: 'Lớp 09 - Bao bì và đồ chứa', value: '09' },
-    { label: 'Lớp 10 - Đồng hồ và đồ trang sức', value: '10' },
-    { label: 'Lớp 11 - Đồ trang trí', value: '11' },
-    { label: 'Lớp 12 - Phương tiện vận tải', value: '12' },
-    { label: 'Lớp 13 - Thiết bị sản xuất và phân phối điện', value: '13' },
-    { label: 'Lớp 14 - Thiết bị ghi âm, viễn thông', value: '14' },
-    { label: 'Lớp 15 - Máy móc', value: '15' },
-    { label: 'Lớp 16 - Thiết bị nhiếp ảnh, điện ảnh', value: '16' },
-    { label: 'Lớp 17 - Nhạc cụ', value: '17' },
-    { label: 'Lớp 18 - In ấn và văn phòng phẩm', value: '18' },
-    { label: 'Lớp 19 - Văn phòng phẩm, nghệ thuật, giáo dục', value: '19' },
-    { label: 'Lớp 20 - Thiết bị bán hàng và quảng cáo', value: '20' },
-    { label: 'Lớp 21 - Trò chơi, đồ chơi, lều trại', value: '21' },
-    { label: 'Lớp 22 - Vũ khí, pháo hoa, săn bắn', value: '22' },
-    { label: 'Lớp 23 - Thiết bị chống cháy, bảo vệ, cứu hộ', value: '23' },
-    { label: 'Lớp 24 - Y tế', value: '24' },
-    { label: 'Lớp 25 - Xây dựng và kiến trúc', value: '25' },
-    { label: 'Lớp 26 - Thiết bị chiếu sáng', value: '26' },
-    { label: 'Lớp 27 - Thuốc lá và đồ hút thuốc', value: '27' },
-    { label: 'Lớp 28 - Thiết bị y tế, chăm sóc sức khỏe', value: '28' },
-    { label: 'Lớp 29 - Thiết bị vận chuyển, nâng hạ', value: '29' },
-    { label: 'Lớp 30 - Chăm sóc và xử lý thực phẩm', value: '30' },
-    { label: 'Lớp 31 - Thiết bị, dụng cụ nấu ăn', value: '31' },
-    { label: 'Lớp 32 - Biểu tượng đồ họa, logo, ký hiệu', value: '32' },
   ]
 
   const countryOptions = [
@@ -419,99 +382,6 @@ export default function PatentsPage() {
                       className="w-full"
                     />
                   </div>
-                  <div>
-                    <Label htmlFor="expiry_date">Ngày hết hạn</Label>
-                    <DateRangePicker
-                      showPresets={true}
-                      date={{
-                        from: data.expiry_date_from ? new Date(data.expiry_date_from) : undefined,
-                        to: data.expiry_date_to ? new Date(data.expiry_date_to) : undefined
-                      }}
-                      onDateChange={(range) => {
-                        setData({
-                          ...data,
-                          expiry_date_from: range?.from ? range.from.toISOString().split('T')[0] : '',
-                          expiry_date_to: range?.to ? range.to.toISOString().split('T')[0] : ''
-                        });
-                      }}
-                      className="w-full"
-                    />
-                  </div>
-                </div>
-              </div>
-
-              {/* Classification - Phân loại */}
-              <div className="border rounded-lg p-4">
-                <h3 className="text-sm font-semibold mb-3 text-primary">Phân loại (Classification)</h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3">
-                  <div>
-                    <Label htmlFor="ipc_class">IPC Class</Label>
-                    <SingleSelect
-                      instanceId="ipc-class-select"
-                      isClearable
-                      options={locarnoClassOptions}
-                      value={locarnoClassOptions.find(b => b.value === data.ipc_class) ? {
-                        value: data.ipc_class,
-                        label: locarnoClassOptions.find(b => b.value === data.ipc_class)?.label || ''
-                      } : null}
-                      onChange={(selected) => setData({
-                        ...data,
-                        ipc_class: selected ? selected.value as string : ''
-                      })}
-                      placeholder="Locarno Class"
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="goods_services">Tên hàng hóa</Label>
-                    <Input
-                      id="goods_services"
-                      type="text"
-                      placeholder="Tên hàng hóa..."
-                      value={data.goods_services}
-                      onChange={(e) => setData({ ...data, goods_services: e.target.value })}
-                    />
-                  </div>
-                </div>
-              </div>
-
-              {/* Country - Quốc gia */}
-              <div className="border rounded-lg p-4">
-                <h3 className="text-sm font-semibold mb-3 text-primary">Quốc gia (Country)</h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                  <div>
-                    <Label htmlFor="origin_country">Quốc gia đơn gốc</Label>
-                    <SingleSelect
-                      instanceId="origin-country-select"
-                      isClearable
-                      options={countryOptions}
-                      value={countryOptions.find(b => b.value === data.origin_country) ? {
-                        value: data.origin_country,
-                        label: countryOptions.find(b => b.value === data.origin_country)?.label || ''
-                      } : null}
-                      onChange={(selected) => setData({
-                        ...data,
-                        origin_country: selected ? selected.value as string : ''
-                      })}
-                      placeholder="Quốc gia đơn gốc"
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="country">Quốc gia bảo hộ</Label>
-                    <SingleSelect
-                      instanceId="country-select"
-                      isClearable
-                      options={countryOptions}
-                      value={countryOptions.find(b => b.value === data.country) ? {
-                        value: data.country,
-                        label: countryOptions.find(b => b.value === data.country)?.label || ''
-                      } : null}
-                      onChange={(selected) => setData({
-                        ...data,
-                        country: selected ? selected.value as string : ''
-                      })}
-                      placeholder="Quốc gia bảo hộ"
-                    />
-                  </div>
                 </div>
               </div>
 
@@ -659,10 +529,8 @@ export default function PatentsPage() {
                 <TableHead className="text-center">Hình ảnh</TableHead>
                 <TableHead>Mã</TableHead>
                 <TableHead>Tên</TableHead>
-                <TableHead className="min-w-[80px]">Quốc gia đơn gốc</TableHead>
-                <TableHead className="min-w-[80px]">Quốc gia bảo hộ</TableHead>
+                <TableHead>Sản phẩm</TableHead>
                 <TableHead>Chủ đơn</TableHead>
-                <TableHead>Nhóm (ipc)</TableHead>
                 <TableHead className="min-w-[120px]">Số đơn</TableHead>
                 <TableHead>Ngày nộp đơn</TableHead>
                 <TableHead>Số bằng</TableHead>
@@ -711,16 +579,10 @@ export default function PatentsPage() {
                     {record.name}
                   </TableCell>
                   <TableCell className="text-sm">
-                    {record.origin_country}
-                  </TableCell>
-                  <TableCell className="text-sm">
-                    {record.country}
+                    {record.product}
                   </TableCell>
                   <TableCell className="text-sm">
                     {record.applicant}
-                  </TableCell>
-                  <TableCell className="text-sm">
-                    {record.ipc_class}
                   </TableCell>
                   <TableCell className="text-sm">
                     {record.application_number}

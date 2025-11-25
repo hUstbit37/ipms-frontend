@@ -1,12 +1,12 @@
 "use client"
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Input } from "@/components/ui/input"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Switch } from "@/components/ui/switch"
-import { Plus, Search, Filter, Download, Eye, Pencil, Trash2, MoreHorizontal, RotateCcw, ChevronLeft, ChevronRight, ChevronDown } from "lucide-react"
+import { Plus, Search, Download, Eye, Pencil, Trash2, MoreHorizontal, RotateCcw, ChevronLeft, ChevronRight, ChevronDown } from "lucide-react"
 import {
   Table,
   TableBody,
@@ -30,37 +30,43 @@ import { useQuery } from "@tanstack/react-query"
 import { Label } from "@/components/ui/label"
 import SingleSelect from "@/components/custom/select/single-select"
 import { DateRangePicker } from "@/components/custom/date/date-range-picker"
+import { useRouter } from "next/navigation"
+import ImageShowList from "@/components/custom/image/image-show-list"
 
-interface Patent {
+type Patent = {
   id: number
   code: string
+  logo: string
   name: string
-  country_code: string
+  origin_country: string // Quốc gia đơn gốc
+  country: string // Quốc gia bảo hộ (chính là quốc gia trong mỗi bản ghi)
+  applicant: string // Chủ đơn
   application_number: string
   application_date: string
-  publication_date: string
-  applicant: string
-  agency: string
-  status: string
-  classes: string
+  certificate_number: string
+  status: string //trạng thái pháp lý
+  agency: string // Đại diện
+  commercial_status: string //trạng thái thương mại
+  ipc_class: string
 }
 
-const fetchData = async (): Promise<Patent[]> => {
+const fetchRecords = async (): Promise<Patent[]> => {
   const response = await fetch('/data/patents.json')
   if (!response.ok) {
-    throw new Error('Failed to fetch patents data')
+    throw new Error('Failed to fetch data')
   }
   return response.json()
 }
 
 export default function PatentsPage() {
   const { setBreadcrumbs } = useBreadcrumbs()
+  const router = useRouter()
   const [currentPage, setCurrentPage] = useState(1)
   const itemsPerPage = 10
 
   const { data: allRecords = [], isLoading, error } = useQuery({
     queryKey: ['patents'],
-    queryFn: fetchData,
+    queryFn: fetchRecords,
   })
   
   useEffect(() => {
@@ -87,24 +93,92 @@ export default function PatentsPage() {
 
   const [selectedStatus, setSelectedStatus] = useState<string>('')
   const statusOptions = [
-    { label: 'Đang giải quyết', value: 'pending' },
+    { label: 'Đã nộp đơn', value: 'filed' },
+    { label: 'Từ chối hình thức', value: 'formal_refused' },
+    { label: 'Giải trình hình thức', value: 'formal_response' },
+    { label: 'Đơn hợp lệ', value: 'formally_accepted' },
+    { label: 'Bị phản đối', value: 'opposed' },
+    { label: 'Từ chối nội dung', value: 'content_refused' },
+    { label: 'Giải trình nội dung', value: 'content_response' },
+    { label: 'Công bố', value: 'published' },
+    { label: 'Đóng phí cấp bằng', value: 'grant_fee_paid' },
     { label: 'Cấp bằng', value: 'granted' },
-    { label: 'Hủy', value: 'cancelled' },
+    { label: 'Từ chối cấp bằng', value: 'grant_refused' },
+    { label: 'Khiếu nại/ Khởi kiện QĐHC', value: 'appealed' },
+    { label: 'Chuyển nhượng đơn', value: 'app_transferred' },
+    { label: 'Chuyển nhượng bằng', value: 'right_transferred' },
+    { label: 'Rút đơn', value: 'withdrawn' },
+    { label: 'Đang sửa đơn', value: 'app_under_amend' },
+    { label: 'Đang sửa bằng', value: 'cert_under_amend' },
+    { label: 'Gia hạn', value: 'renewed' },
+    { label: 'Hết hiệu lực', value: 'expired' },
+    { label: 'Từ bỏ đăng ký', value: 'abandoned' },
+  ]
+
+  const commercialStatusOptions = [
+    { label: 'Đang sử dụng', value: 'in_use' },
+    { label: 'Cấp phép', value: 'licensed' },
+    { label: 'Nhượng quyền thương mại', value: 'franchised' },
+    { label: 'Đã nhượng quyền', value: 'franchise_granted' },
+    { label: 'Chưa khai thác', value: 'unused' },
+    { label: 'Chuyển nhượng', value: 'assigned' },
+    { label: 'Đang đàm phán', value: 'negotiating' },
+    { label: 'Đã ngưng khai thác', value: 'discontinued' },
   ]
 
   const workflowStatusOptions = [
     { label: 'Nháp', value: 'draft' },
-    { label: 'Đang xem xét', value: 'in_review' },
-    { label: 'Xác nhận', value: 'approved' },
+    { label: 'Chờ duyệt', value: 'pending_review' },
+    { label: 'Đã duyệt', value: 'approved' },
+    { label: 'Từ chối', value: 'rejected' },
   ]
 
-  const niceClassOptions = [
-    { label: 'Lớp 1', value: '1' },
-    { label: 'Lớp 2', value: '2' },
-    { label: 'Lớp 3', value: '3' },
-    { label: 'Lớp 9', value: '9' },
-    { label: 'Lớp 25', value: '25' },
-    { label: 'Lớp 35', value: '35' },
+  const searchStatusOptions = [
+    { label: 'Đã tra cứu', value: 'searched' },
+    { label: 'Chưa tra cứu', value: 'not_searched' },
+  ]
+
+  const ipcClassOptions = [
+    { label: 'A01 - Nông nghiệp; Lâm nghiệp; Chăn nuôi', value: 'A01' },
+    { label: 'A21 - Làm bánh; Thiết bị làm mì ống', value: 'A21' },
+    { label: 'A23 - Thực phẩm hoặc đồ ăn khác', value: 'A23' },
+    { label: 'A47 - Đồ nội thất; Đồ gia dụng', value: 'A47' },
+    { label: 'A61 - Khoa học y tế hoặc thú y; Vệ sinh', value: 'A61' },
+    { label: 'A63 - Thể thao; Trò chơi; Giải trí', value: 'A63' },
+    { label: 'B01 - Quá trình hoặc thiết bị vật lý hoặc hóa học', value: 'B01' },
+    { label: 'B21 - Gia công cơ khí không có thiết bị cắt', value: 'B21' },
+    { label: 'B23 - Máy công cụ; Gia công kim loại', value: 'B23' },
+    { label: 'B29 - Làm việc với chất dẻo; Làm việc với các chất', value: 'B29' },
+    { label: 'B60 - Phương tiện vận tải', value: 'B60' },
+    { label: 'B62 - Phương tiện đường bộ không có động cơ', value: 'B62' },
+    { label: 'B65 - Vận chuyển; Đóng gói; Lưu trữ', value: 'B65' },
+    { label: 'C07 - Hóa học hữu cơ', value: 'C07' },
+    { label: 'C08 - Hợp chất vĩ mô hữu cơ', value: 'C08' },
+    { label: 'C12 - Hóa sinh; Bia; Rượu; Rượu vang', value: 'C12' },
+    { label: 'E01 - Xây dựng đường; Đường sắt; Cầu', value: 'E01' },
+    { label: 'E04 - Xây dựng', value: 'E04' },
+    { label: 'F16 - Các bộ phận máy móc hoặc động cơ', value: 'F16' },
+    { label: 'F21 - Đốt nóng; Dãn nở; Cung cấp nhiệt', value: 'F21' },
+    { label: 'G01 - Đo lường; Kiểm tra', value: 'G01' },
+    { label: 'G06 - Tính toán; Đếm', value: 'G06' },
+    { label: 'G09 - Giáo dục; Mật mã; Hiển thị', value: 'G09' },
+    { label: 'H01 - Các phần tử điện cơ bản', value: 'H01' },
+    { label: 'H02 - Sản xuất, chuyển đổi hoặc phân phối điện', value: 'H02' },
+    { label: 'H04 - Kỹ thuật điện thông tin', value: 'H04' },
+    { label: 'H05 - Kỹ thuật điện không được quy định ở nơi khác', value: 'H05' },
+  ]
+
+  const countryOptions = [
+    { label: 'Việt Nam', value: 'VN' },
+    { label: 'Hoa Kỳ', value: 'US' },
+    { label: 'Nhật Bản', value: 'JP' },
+    { label: 'Hàn Quốc', value: 'KR' },
+    { label: 'Trung Quốc', value: 'CN' },
+    { label: 'Đức', value: 'DE' },
+    { label: 'Pháp', value: 'FR' },
+    { label: 'Anh', value: 'GB' },
+    { label: 'Thái Lan', value: 'TH' },
+    { label: 'Singapore', value: 'SG' },
   ]
 
   const [data, setData] = useState({
@@ -128,13 +202,17 @@ export default function PatentsPage() {
     expiry_date_to: '',
     // Chủ thể
     applicant: '',
-    agency: '',
+    representative: '',
     // Trạng thái
-    status: '', //trạng thái pháp lý
-    workflow_status: '', //trạng thái nội bộ
+    status: '',
+    commercial_status: '',
+    search_status: '',
     // Phân loại
-    locarno_class: '',
-    country_code: '',
+    ipc_class: '',
+    goods_services: '',
+    // Quốc gia
+    origin_country: '',
+    country: '',
   })
 
   const [showAdvancedSearch, setShowAdvancedSearch] = useState(false)
@@ -177,56 +255,9 @@ export default function PatentsPage() {
             )}
             {showAdvancedSearch && (
             <div className="space-y-4">
-              {/* Thông tin cơ bản */}
-              <div>
-                {/* <h3 className="text-sm font-semibold mb-3">Thông tin cơ bản</h3> */}
-                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-3">
-                  <div>
-                    <Label htmlFor="name">Tên</Label>
-                    <Input
-                      id="name"
-                      type="text"
-                      placeholder="Tên..."
-                      value={data.name}
-                      onChange={(e) => setData({ ...data, name: e.target.value })}
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="product">Sản phẩm</Label>
-                    <Input
-                      id="product"
-                      type="text"
-                      placeholder="Sản phẩm..."
-                      value={data.product}
-                      onChange={(e) => setData({ ...data, product: e.target.value })}
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="description">Mô tả</Label>
-                    <Input
-                      id="description"
-                      type="text"
-                      placeholder="Mô tả..."
-                      value={data.description}
-                      onChange={(e) => setData({ ...data, description: e.target.value })}
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="note">Ghi chú</Label>
-                    <Input
-                      id="note"
-                      type="text"
-                      placeholder="Ghi chú..."
-                      value={data.note}
-                      onChange={(e) => setData({ ...data, note: e.target.value })}
-                    />
-                  </div>
-                </div>
-              </div>
-
-              {/* Số đơn */}
-              <div>
-                {/* <h3 className="text-sm font-semibold mb-3">Số đơn</h3> */}
+              {/* Number - Số */}
+              <div className="border rounded-lg p-4">
+                <h3 className="text-sm font-semibold mb-3 text-primary">Số (Number)</h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3">
                   <div>
                     <Label htmlFor="application_number">Số đơn</Label>
@@ -261,9 +292,73 @@ export default function PatentsPage() {
                 </div>
               </div>
 
-              {/* Ngày */}
-              <div>
-                {/* <h3 className="text-sm font-semibold mb-3">Ngày</h3> */}
+              {/* Mark - Nhãn hiệu */}
+              <div className="border rounded-lg p-4">
+                <h3 className="text-sm font-semibold mb-3 text-primary">Nhãn hiệu (Mark)</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3">
+                  <div>
+                    <Label htmlFor="name">Tên</Label>
+                    <Input
+                      id="name"
+                      type="text"
+                      placeholder="Tên..."
+                      value={data.name}
+                      onChange={(e) => setData({ ...data, name: e.target.value })}
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="product">Sản phẩm</Label>
+                    <Input
+                      id="product"
+                      type="text"
+                      placeholder="Sản phẩm..."
+                      value={data.product}
+                      onChange={(e) => setData({ ...data, product: e.target.value })}
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="description">Mô tả</Label>
+                    <Input
+                      id="description"
+                      type="text"
+                      placeholder="Mô tả..."
+                      value={data.description}
+                      onChange={(e) => setData({ ...data, description: e.target.value })}
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Name & Address - Tên và địa chỉ */}
+              <div className="border rounded-lg p-4">
+                <h3 className="text-sm font-semibold mb-3 text-primary">Tên & Địa chỉ (Name & Address)</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                  <div>
+                    <Label htmlFor="applicant">Chủ đơn/Chủ bằng</Label>
+                    <Input
+                      id="applicant"
+                      type="text"
+                      placeholder="Chủ đơn/Chủ bằng..."
+                      value={data.applicant}
+                      onChange={(e) => setData({ ...data, applicant: e.target.value })}
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="representative">Đại diện</Label>
+                    <Input
+                      id="representative"
+                      type="text"
+                      placeholder="Đại diện..."
+                      value={data.representative}
+                      onChange={(e) => setData({ ...data, representative: e.target.value })}
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Date - Ngày tháng */}
+              <div className="border rounded-lg p-4">
+                <h3 className="text-sm font-semibold mb-3 text-primary">Ngày tháng (Date)</h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-3">
                   <div>
                     <Label htmlFor="application_date">Ngày nộp đơn</Label>
@@ -340,41 +435,89 @@ export default function PatentsPage() {
                 </div>
               </div>
 
-              {/* Chủ thể */}
-              <div>
-                {/* <h3 className="text-sm font-semibold mb-3">Chủ thể</h3> */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+              {/* Classification - Phân loại */}
+              <div className="border rounded-lg p-4">
+                <h3 className="text-sm font-semibold mb-3 text-primary">Phân loại (Classification)</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3">
                   <div>
-                    <Label htmlFor="applicant">Chủ đơn/Chủ bằng</Label>
-                    <Input
-                      id="applicant"
-                      type="text"
-                      placeholder="Chủ đơn/Chủ bằng..."
-                      value={data.applicant}
-                      onChange={(e) => setData({ ...data, applicant: e.target.value })}
+                    <Label htmlFor="ipc_class">IPC Class</Label>
+                    <SingleSelect
+                      instanceId="ipc-class-select"
+                      isClearable
+                      options={ipcClassOptions}
+                      value={ipcClassOptions.find(b => b.value === data.ipc_class) ? {
+                        value: data.ipc_class,
+                        label: ipcClassOptions.find(b => b.value === data.ipc_class)?.label || ''
+                      } : null}
+                      onChange={(selected) => setData({
+                        ...data,
+                        ipc_class: selected ? selected.value as string : ''
+                      })}
+                      placeholder="Locarno Class"
                     />
                   </div>
                   <div>
-                    <Label htmlFor="representative">Đại diện</Label>
+                    <Label htmlFor="goods_services">Tên hàng hóa</Label>
                     <Input
-                      id="representative"
+                      id="goods_services"
                       type="text"
-                      placeholder="Đại diện..."
-                      value={data.agency}
-                      onChange={(e) => setData({ ...data, agency: e.target.value })}
+                      placeholder="Tên hàng hóa..."
+                      value={data.goods_services}
+                      onChange={(e) => setData({ ...data, goods_services: e.target.value })}
                     />
                   </div>
                 </div>
               </div>
 
-              {/* Trạng thái */}
-              <div>
-                {/* <h3 className="text-sm font-semibold mb-3">Trạng thái</h3> */}
+              {/* Country - Quốc gia */}
+              <div className="border rounded-lg p-4">
+                <h3 className="text-sm font-semibold mb-3 text-primary">Quốc gia (Country)</h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                  <div>
+                    <Label htmlFor="origin_country">Quốc gia đơn gốc</Label>
+                    <SingleSelect
+                      instanceId="origin-country-select"
+                      isClearable
+                      options={countryOptions}
+                      value={countryOptions.find(b => b.value === data.origin_country) ? {
+                        value: data.origin_country,
+                        label: countryOptions.find(b => b.value === data.origin_country)?.label || ''
+                      } : null}
+                      onChange={(selected) => setData({
+                        ...data,
+                        origin_country: selected ? selected.value as string : ''
+                      })}
+                      placeholder="Quốc gia đơn gốc"
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="country">Quốc gia bảo hộ</Label>
+                    <SingleSelect
+                      instanceId="country-select"
+                      isClearable
+                      options={countryOptions}
+                      value={countryOptions.find(b => b.value === data.country) ? {
+                        value: data.country,
+                        label: countryOptions.find(b => b.value === data.country)?.label || ''
+                      } : null}
+                      onChange={(selected) => setData({
+                        ...data,
+                        country: selected ? selected.value as string : ''
+                      })}
+                      placeholder="Quốc gia bảo hộ"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Status - Trạng thái */}
+              <div className="border rounded-lg p-4">
+                <h3 className="text-sm font-semibold mb-3 text-primary">Trạng thái (Status)</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3">
                   <div>
                     <Label htmlFor="status">Trạng thái pháp lý</Label>
                     <SingleSelect
-                      instanceId="legal-status-select"
+                      instanceId="status-select"
                       isClearable
                       options={statusOptions}
                       value={statusOptions.find(b => b.value === data.status) ? {
@@ -389,47 +532,54 @@ export default function PatentsPage() {
                     />
                   </div>
                   <div>
-                    <Label htmlFor="workflow_status">Trạng thái nội bộ</Label>
+                    <Label htmlFor="commercial_status">Trạng thái thương mại</Label>
                     <SingleSelect
-                      instanceId="workflow-status-select"
+                      instanceId="commercial-status-select"
                       isClearable
-                      options={workflowStatusOptions}
-                      value={workflowStatusOptions.find(b => b.value === data.workflow_status) ? {
-                        value: data.workflow_status,
-                        label: workflowStatusOptions.find(b => b.value === data.workflow_status)?.label || ''
+                      options={commercialStatusOptions}
+                      value={commercialStatusOptions.find(b => b.value === data.commercial_status) ? {
+                        value: data.commercial_status,
+                        label: commercialStatusOptions.find(b => b.value === data.commercial_status)?.label || ''
                       } : null}
                       onChange={(selected) => setData({
                         ...data,
-                        workflow_status: selected ? selected.value as string : ''
+                        commercial_status: selected ? selected.value as string : ''
                       })}
-                      placeholder="Trạng thái nội bộ"
+                      placeholder="Trạng thái thương mại"
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="search_status">Trạng thái tra cứu</Label>
+                    <SingleSelect
+                      instanceId="search-status-select"
+                      isClearable
+                      options={searchStatusOptions}
+                      value={searchStatusOptions.find(b => b.value === data.search_status) ? {
+                        value: data.search_status,
+                        label: searchStatusOptions.find(b => b.value === data.search_status)?.label || ''
+                      } : null}
+                      onChange={(selected) => setData({
+                        ...data,
+                        search_status: selected ? selected.value as string : ''
+                      })}
+                      placeholder="Trạng thái tra cứu"
                     />
                   </div>
                 </div>
               </div>
 
-              {/* Phân loại */}
-              <div>
-                {/* <h3 className="text-sm font-semibold mb-3">Phân loại</h3> */}
-                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3">
+              {/* Other - Khác */}
+              <div className="border rounded-lg p-4">
+                <h3 className="text-sm font-semibold mb-3 text-primary">Khác (Other)</h3>
+                <div className="grid grid-cols-1 gap-3">
                   <div>
-                    <Label htmlFor="locarno_class">Locarno Class</Label>
+                    <Label htmlFor="note">Ghi chú</Label>
                     <Input
-                      id="locarno_class"
+                      id="note"
                       type="text"
-                      placeholder="Locarno Class..."
-                      value={data.locarno_class}
-                      onChange={(e) => setData({ ...data, locarno_class: e.target.value })}
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="country">Quốc gia</Label>
-                    <Input
-                      id="country"
-                      type="text"
-                      placeholder="Quốc gia..."
-                      value={data.country_code}
-                      onChange={(e) => setData({ ...data, country_code: e.target.value })}
+                      placeholder="Ghi chú..."
+                      value={data.note}
+                      onChange={(e) => setData({ ...data, note: e.target.value })}
                     />
                   </div>
                 </div>
@@ -485,7 +635,12 @@ export default function PatentsPage() {
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
-            <Button variant="default" size="default" className="gap-2">
+            <Button 
+              variant="default" 
+              size="default" 
+              className="gap-2"
+              onClick={() => router.push('/trademarks/create')}
+            >
               <Plus className="h-4 w-4" />
               Tạo mới
             </Button>
@@ -496,70 +651,89 @@ export default function PatentsPage() {
                 <TableHead className="w-[50px]">
                   <Checkbox />
                 </TableHead>
+                <TableHead className="text-center">Hình ảnh</TableHead>
+                <TableHead>Mã</TableHead>
                 <TableHead>Tên</TableHead>
-                <TableHead>Số đơn</TableHead>
+                <TableHead className="min-w-[80px]">Quốc gia đơn gốc</TableHead>
+                <TableHead className="min-w-[80px]">Quốc gia bảo hộ</TableHead>
+                <TableHead>Chủ đơn</TableHead>
+                <TableHead>Nhóm (ipc)</TableHead>
+                <TableHead className="min-w-[120px]">Số đơn</TableHead>
                 <TableHead>Ngày nộp đơn</TableHead>
                 <TableHead>Số bằng</TableHead>
-                <TableHead>Ngày cấp</TableHead>
-                <TableHead>Nhóm phân loại</TableHead>
-                <TableHead>Chủ đơn/Chủ bằng</TableHead>
                 <TableHead>Đại diện</TableHead>
-                <TableHead>Trạng thái</TableHead>
+                <TableHead className="min-w-[80px]">Trạng thái pháp lý</TableHead>
+                <TableHead className="min-w-[80px]">Trạng thái thương mại</TableHead>
                 <TableHead className="text-right">Thao tác</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {isLoading ? (
                 <TableRow>
-                  <TableCell colSpan={12} className="text-center py-8">
+                  <TableCell colSpan={15} className="text-center py-8">
                     Đang tải dữ liệu...
                   </TableCell>
                 </TableRow>
               ) : error ? (
                 <TableRow>
-                  <TableCell colSpan={12} className="text-center py-8 text-destructive">
-                    {/* Lỗi khi tải dữ liệu */}
-                    Không có dữ liệu
+                  <TableCell colSpan={15} className="text-center py-8 text-destructive">
+                    Lỗi khi tải dữ liệu
                   </TableCell>
                 </TableRow>
               ) : currentRecords.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={12} className="text-center py-8">
+                  <TableCell colSpan={15} className="text-center py-8">
                     Không có dữ liệu
                   </TableCell>
                 </TableRow>
               ) : (
-                currentRecords.map((item) => (
-                <TableRow key={item.id}>
+                currentRecords.map((record) => (
+                <TableRow key={record.id}>
                   <TableCell>
                     <Checkbox />
                   </TableCell>
+                  <TableCell className="text-center">
+                    <ImageShowList
+                        src={record.logo} 
+                        alt={record.name || "Logo"}
+                        size="md"
+                    />
+                  </TableCell>
+                  <TableCell className="text-sm">
+                    {record.code}
+                  </TableCell>
                   <TableCell className="font-medium">
-                    {item.name}
+                    {record.name}
                   </TableCell>
                   <TableCell className="text-sm">
-                    {item.application_number}
+                    {record.origin_country}
                   </TableCell>
                   <TableCell className="text-sm">
-                    {item.application_date}
+                    {record.country}
                   </TableCell>
                   <TableCell className="text-sm">
-                    -
+                    {record.applicant}
                   </TableCell>
                   <TableCell className="text-sm">
-                    -
+                    {record.ipc_class}
                   </TableCell>
                   <TableCell className="text-sm">
-                    {item.classes}
+                    {record.application_number}
                   </TableCell>
-                  <TableCell className="  text-sm">
-                    {item.applicant}
+                  <TableCell className="text-sm">
+                    {record.application_date}
                   </TableCell>
-                  <TableCell className="  text-sm">
-                    {item.agency}
+                  <TableCell className="text-sm">
+                    {record.certificate_number || '-'}
+                  </TableCell>
+                  <TableCell className="text-sm">
+                    {record.agency}
                   </TableCell>
                   <TableCell>
-                    <Badge variant="secondary">{item.status}</Badge>
+                    <Badge variant="secondary">{record.status}</Badge>
+                  </TableCell>
+                  <TableCell>
+                    <Badge variant="outline">{record.commercial_status}</Badge>
                   </TableCell>
                   <TableCell className="text-right">
                     <DropdownMenu>

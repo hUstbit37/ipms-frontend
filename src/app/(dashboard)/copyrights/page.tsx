@@ -33,7 +33,7 @@ import { DateRangePicker } from "@/components/custom/date/date-range-picker"
 import { useRouter } from "next/navigation"
 import ImageShowList from "@/components/custom/image/image-show-list"
 
-type Patent = {
+type Copyright = {
   id: number
   code: string
   logo: string
@@ -47,32 +47,33 @@ type Patent = {
   status: string //trạng thái pháp lý
   agency: string // Đại diện
   commercial_status: string //trạng thái thương mại
-  ipc_class: string
+  object_internal: string // loại tác phẩm nội bộ
+  object_law: string // loại tác phẩm theo pháp luật
 }
 
-const fetchRecords = async (): Promise<Patent[]> => {
-  const response = await fetch('/data/patents.json')
+const fetchRecords = async (): Promise<Copyright[]> => {
+  const response = await fetch('/data/copyrights.json')
   if (!response.ok) {
     throw new Error('Failed to fetch data')
   }
   return response.json()
 }
 
-export default function PatentsPage() {
+export default function CopyrightsPage() {
   const { setBreadcrumbs } = useBreadcrumbs()
   const router = useRouter()
   const [currentPage, setCurrentPage] = useState(1)
   const itemsPerPage = 10
 
   const { data: allRecords = [], isLoading, error } = useQuery({
-    queryKey: ['patents'],
+    queryKey: ['copyrights'],
     queryFn: fetchRecords,
   })
   
   useEffect(() => {
     setBreadcrumbs([
       { label: "Dashboard", href: "/" },
-      { label: "Sáng chế", href: "/patents" },
+      { label: "Quyền tác giả", href: "/copyrights" },
       { label: "Danh sách" }
     ])
   }, [setBreadcrumbs])
@@ -91,7 +92,6 @@ export default function PatentsPage() {
     setCurrentPage((prev) => Math.max(prev - 1, 1))
   }
 
-  const [selectedStatus, setSelectedStatus] = useState<string>('')
   const statusOptions = [
     { label: 'Đã nộp đơn', value: 'filed' },
     { label: 'Từ chối hình thức', value: 'formal_refused' },
@@ -138,41 +138,6 @@ export default function PatentsPage() {
     { label: 'Chưa tra cứu', value: 'not_searched' },
   ]
 
-  const locarnoClassOptions = [
-    { label: 'Lớp 01 - Thực phẩm', value: '01' },
-    { label: 'Lớp 02 - Quần áo và phụ kiện may mặc', value: '02' },
-    { label: 'Lớp 03 - Đồ du lịch, hộp đựng, ô dù', value: '03' },
-    { label: 'Lớp 04 - Bàn chải', value: '04' },
-    { label: 'Lớp 05 - Dệt may, tấm vải nhân tạo', value: '05' },
-    { label: 'Lớp 06 - Đồ nội thất', value: '06' },
-    { label: 'Lớp 07 - Đồ gia dụng', value: '07' },
-    { label: 'Lớp 08 - Dụng cụ và thiết bị thủ công', value: '08' },
-    { label: 'Lớp 09 - Bao bì và đồ chứa', value: '09' },
-    { label: 'Lớp 10 - Đồng hồ và đồ trang sức', value: '10' },
-    { label: 'Lớp 11 - Đồ trang trí', value: '11' },
-    { label: 'Lớp 12 - Phương tiện vận tải', value: '12' },
-    { label: 'Lớp 13 - Thiết bị sản xuất và phân phối điện', value: '13' },
-    { label: 'Lớp 14 - Thiết bị ghi âm, viễn thông', value: '14' },
-    { label: 'Lớp 15 - Máy móc', value: '15' },
-    { label: 'Lớp 16 - Thiết bị nhiếp ảnh, điện ảnh', value: '16' },
-    { label: 'Lớp 17 - Nhạc cụ', value: '17' },
-    { label: 'Lớp 18 - In ấn và văn phòng phẩm', value: '18' },
-    { label: 'Lớp 19 - Văn phòng phẩm, nghệ thuật, giáo dục', value: '19' },
-    { label: 'Lớp 20 - Thiết bị bán hàng và quảng cáo', value: '20' },
-    { label: 'Lớp 21 - Trò chơi, đồ chơi, lều trại', value: '21' },
-    { label: 'Lớp 22 - Vũ khí, pháo hoa, săn bắn', value: '22' },
-    { label: 'Lớp 23 - Thiết bị chống cháy, bảo vệ, cứu hộ', value: '23' },
-    { label: 'Lớp 24 - Y tế', value: '24' },
-    { label: 'Lớp 25 - Xây dựng và kiến trúc', value: '25' },
-    { label: 'Lớp 26 - Thiết bị chiếu sáng', value: '26' },
-    { label: 'Lớp 27 - Thuốc lá và đồ hút thuốc', value: '27' },
-    { label: 'Lớp 28 - Thiết bị y tế, chăm sóc sức khỏe', value: '28' },
-    { label: 'Lớp 29 - Thiết bị vận chuyển, nâng hạ', value: '29' },
-    { label: 'Lớp 30 - Chăm sóc và xử lý thực phẩm', value: '30' },
-    { label: 'Lớp 31 - Thiết bị, dụng cụ nấu ăn', value: '31' },
-    { label: 'Lớp 32 - Biểu tượng đồ họa, logo, ký hiệu', value: '32' },
-  ]
-
   const countryOptions = [
     { label: 'Việt Nam', value: 'VN' },
     { label: 'Hoa Kỳ', value: 'US' },
@@ -184,6 +149,35 @@ export default function PatentsPage() {
     { label: 'Anh', value: 'GB' },
     { label: 'Thái Lan', value: 'TH' },
     { label: 'Singapore', value: 'SG' },
+  ]
+
+  const objectInternalOptions = [
+    { value: '1', label: 'Bao bì (Packaging)' },
+    { value: '2', label: 'TVC (Television Commercial)' },
+    { value: '3', label: 'Phần mềm (Software)' },
+    { value: '4', label: 'Sách vở (Books)' },
+    { value: '5', label: 'Âm nhạc (Music)' },
+    { value: '6', label: 'Phim ảnh (Films)' },
+    { value: '7', label: 'Thiết kế đồ họa (Graphic Arts)' },
+    { value: '8', label: 'Kiến trúc (Architecture)' },
+    { value: '9', label: 'Kịch bản (Scripts)' },
+    { value: '10', label: 'Ảnh chụp (Photographs)' },
+    { value: '11', label: 'Giao diện Website, phần mềm' },
+  ]
+
+  const objectLawOptions = [
+    { value: '12', label: 'Tác phẩm văn học, khoa học, sách giáo khoa, giáo trình và tác phẩm khác được thể hiện dưới dạng chữ viết hoặc ký tự khác' },
+    { value: '13', label: 'Bài giảng, bài phát biểu và bài nói khác' },
+    { value: '14', label: 'Tác phẩm báo chí' },
+    { value: '15', label: 'Tác phẩm âm nhạc' },
+    { value: '16', label: 'Tác phẩm sân khấu' },
+    { value: '17', label: 'Tác phẩm điện ảnh và tác phẩm được tạo ra theo phương pháp tương tự' },
+    { value: '18', label: 'Tác phẩm tạo hình, mỹ thuật ứng dụng' },
+    { value: '19', label: 'Tác phẩm nhiếp ảnh' },
+    { value: '20', label: 'Tác phẩm kiến trúc' },
+    { value: '21', label: 'Bản họa đồ, sơ đồ, bản đồ, bản vẽ liên quan đến địa hình, kiến trúc, công trình khoa học' },
+    { value: '22', label: 'Tác phẩm văn học, nghệ thuật dân gian' },
+    { value: '23', label: 'Chương trình máy tính, sưu tập dữ liệu' },
   ]
 
   const [data, setData] = useState({
@@ -213,8 +207,8 @@ export default function PatentsPage() {
     commercial_status: '',
     search_status: '',
     // Phân loại
-    ipc_class: '',
-    goods_services: '',
+    object_internal_id: '',
+    object_law_id: '',
     // Quốc gia
     origin_country: '',
     country: '',
@@ -445,30 +439,37 @@ export default function PatentsPage() {
                 <h3 className="text-sm font-semibold mb-3 text-primary">Phân loại (Classification)</h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3">
                   <div>
-                    <Label htmlFor="ipc_class">IPC Class</Label>
+                    <Label htmlFor="object_internal_id">Loại tác phẩm nội bộ</Label>
                     <SingleSelect
-                      instanceId="ipc-class-select"
+                      instanceId="object-internal-select"
                       isClearable
-                      options={locarnoClassOptions}
-                      value={locarnoClassOptions.find(b => b.value === data.ipc_class) ? {
-                        value: data.ipc_class,
-                        label: locarnoClassOptions.find(b => b.value === data.ipc_class)?.label || ''
+                      options={objectInternalOptions}
+                      value={objectInternalOptions.find(b => b.value === data.object_internal_id) ? {
+                        value: data.object_internal_id,
+                        label: objectInternalOptions.find(b => b.value === data.object_internal_id)?.label || ''
                       } : null}
                       onChange={(selected) => setData({
                         ...data,
-                        ipc_class: selected ? selected.value as string : ''
+                        object_internal_id: selected ? selected.value as string : ''
                       })}
-                      placeholder="Locarno Class"
+                      placeholder="Loại tác phẩm nội bộ"
                     />
                   </div>
                   <div>
-                    <Label htmlFor="goods_services">Tên hàng hóa</Label>
-                    <Input
-                      id="goods_services"
-                      type="text"
-                      placeholder="Tên hàng hóa..."
-                      value={data.goods_services}
-                      onChange={(e) => setData({ ...data, goods_services: e.target.value })}
+                    <Label htmlFor="object_law_id">Loại tác phẩm theo pháp luật</Label>
+                    <SingleSelect
+                      instanceId="object-law-select"
+                      isClearable
+                      options={objectLawOptions}
+                      value={objectLawOptions.find(b => b.value === data.object_law_id) ? {
+                        value: data.object_law_id,
+                        label: objectLawOptions.find(b => b.value === data.object_law_id)?.label || ''
+                      } : null}
+                      onChange={(selected) => setData({
+                        ...data,
+                        object_law_id: selected ? selected.value as string : ''
+                      })}
+                      placeholder="Loại tác phẩm theo pháp luật"
                     />
                   </div>
                 </div>
@@ -657,37 +658,34 @@ export default function PatentsPage() {
                   <Checkbox />
                 </TableHead>
                 <TableHead className="text-center">Hình ảnh</TableHead>
-                <TableHead>Mã</TableHead>
                 <TableHead>Tên</TableHead>
-                <TableHead className="min-w-[80px]">Quốc gia đơn gốc</TableHead>
-                <TableHead className="min-w-[80px]">Quốc gia bảo hộ</TableHead>
-                <TableHead>Chủ đơn</TableHead>
-                <TableHead>Nhóm (ipc)</TableHead>
                 <TableHead className="min-w-[120px]">Số đơn</TableHead>
                 <TableHead>Ngày nộp đơn</TableHead>
                 <TableHead>Số bằng</TableHead>
-                <TableHead>Đại diện</TableHead>
-                <TableHead className="min-w-[80px]">Trạng thái pháp lý</TableHead>
-                <TableHead className="min-w-[80px]">Trạng thái thương mại</TableHead>
+                <TableHead>Loại tác phẩm nội bộ</TableHead>
+                <TableHead>Loại tác phẩm theo pháp luật</TableHead>
+                <TableHead>Chủ đơn/Chủ bằng</TableHead>
+                <TableHead>Trạng thái pháp lý</TableHead>
+                <TableHead>Trạng thái thương mại</TableHead>
                 <TableHead className="text-right">Thao tác</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {isLoading ? (
                 <TableRow>
-                  <TableCell colSpan={15} className="text-center py-8">
+                  <TableCell colSpan={12} className="text-center py-8">
                     Đang tải dữ liệu...
                   </TableCell>
                 </TableRow>
               ) : error ? (
                 <TableRow>
-                  <TableCell colSpan={15} className="text-center py-8 text-destructive">
+                  <TableCell colSpan={12} className="text-center py-8 text-destructive">
                     Lỗi khi tải dữ liệu
                   </TableCell>
                 </TableRow>
               ) : currentRecords.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={15} className="text-center py-8">
+                  <TableCell colSpan={12} className="text-center py-8">
                     Không có dữ liệu
                   </TableCell>
                 </TableRow>
@@ -704,23 +702,8 @@ export default function PatentsPage() {
                       size="md"
                     />
                   </TableCell>
-                  <TableCell className="text-sm">
-                    {record.code}
-                  </TableCell>
                   <TableCell className="font-medium">
                     {record.name}
-                  </TableCell>
-                  <TableCell className="text-sm">
-                    {record.origin_country}
-                  </TableCell>
-                  <TableCell className="text-sm">
-                    {record.country}
-                  </TableCell>
-                  <TableCell className="text-sm">
-                    {record.applicant}
-                  </TableCell>
-                  <TableCell className="text-sm">
-                    {record.ipc_class}
                   </TableCell>
                   <TableCell className="text-sm">
                     {record.application_number}
@@ -732,7 +715,13 @@ export default function PatentsPage() {
                     {record.certificate_number || '-'}
                   </TableCell>
                   <TableCell className="text-sm">
-                    {record.agency}
+                    {record.object_internal}
+                  </TableCell>
+                  <TableCell className="text-sm">
+                    {record.object_law}
+                  </TableCell>
+                  <TableCell className="text-sm">
+                    {record.applicant}
                   </TableCell>
                   <TableCell>
                     <Badge variant="secondary">{record.status}</Badge>
