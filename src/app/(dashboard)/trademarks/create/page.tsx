@@ -1,17 +1,16 @@
 "use client"
 
-import { Card, CardContent } from "@/components/ui/card"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Checkbox } from "@/components/ui/checkbox"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { User, Upload, X } from "lucide-react"
 import { useBreadcrumbs } from "@/contexts/breadcrumb-context"
-import { useEffect, useState } from "react"
+import { useEffect, useState, useCallback } from "react"
 import SingleSelect from "@/components/custom/select/single-select"
 import { DateRangePicker } from "@/components/custom/date/date-range-picker"
 import { Textarea } from "@/components/ui/textarea"
+import ImageUploadMulti from "@/components/custom/image/image-upload-multi"
 
 export default function CreateTrademarkPage() {
   const { setBreadcrumbs } = useBreadcrumbs()
@@ -26,20 +25,27 @@ export default function CreateTrademarkPage() {
 
   const [formData, setFormData] = useState({
     // Thông tin chung
-    trademark_name: '',
-    trademark_type: '',
-    legal_status: '',
-    country: '',
-    // Số
-    application_number: '',
-    registration_number: '',
-    location: '',
-    ip_agency: '',
-    // Ngày
-    application_date: '',
-    registration_date: '',
-    expiry_date: '',
-    // Số đăng ký
+    name: '', // Tên nhãn hiệu
+    name_upper_ascii: '', // Tên không dấu
+    trademark_type: '', // Loại nhãn hiệu
+    status: '', // Trạng thái pháp lý
+    country_code: '', // Mã quốc gia
+
+    application_number: '', // Số đơn
+    application_date: '', // Ngày nộp đơn
+    certificate_number: '', // Số văn bằng
+    certificate_date: '', // Ngày cấp văn bằng
+    expiry_date: '',  
+
+    applicant_ids: [] as string[],
+    agency_id: '',
+    authors: '',
+
+    workflow_status: '', // Trạng thái quy trình
+    commercial_status: '', // Tình trạng thương mại
+    search_status: '', // Tình trạng tra cứu
+
+    
     filing_number_1: '',
     filing_date_1: '',
     filing_country_1: '',
@@ -61,7 +67,11 @@ export default function CreateTrademarkPage() {
     // Ghi chú
     notes: '',
     // Checkbox
-    continue_adding: false
+    continue_adding: false,
+    gallery_images: [] as File[],
+    existing_gallery_urls: [] as string[],
+    removed_gallery_urls: [] as string[],
+    gallery_order: [] as { type: 'file' | 'url'; index: number; originalUrl?: string }[],
   })
 
   const trademarkTypeOptions = [
@@ -122,27 +132,34 @@ export default function CreateTrademarkPage() {
     { label: 'OMAGHI II', value: 'omaghi_2' },
   ]
 
+  const handleGalleryChange = useCallback((data: {
+    newFiles: File[]
+    existingUrls: string[]
+    removedUrls: string[]
+    order: { type: 'file' | 'url'; index: number; originalUrl?: string }[]
+  }) => {
+    setFormData(prev => ({ 
+      ...prev, 
+      gallery_images: data.newFiles,
+      existing_gallery_urls: data.existingUrls,
+      removed_gallery_urls: data.removedUrls,
+      gallery_order: data.order
+    }))
+  }, [setFormData])
+
   return (
     <div className="space-y-4">
       {/* Upload Photo Section */}
       <Card>
-        <CardContent className="pt-6">
-          <div className="flex items-center gap-4">
-            <Avatar className="h-20 w-20">
-              <AvatarImage src="" />
-              <AvatarFallback className="bg-muted">
-                <User className="h-10 w-10 text-muted-foreground" />
-              </AvatarFallback>
-            </Avatar>
-            <div className="flex flex-col gap-2">
-              <Button variant="outline" size="sm">
-                Upload Photo
-              </Button>
-              <button className="text-sm text-destructive hover:underline">
-                remove
-              </button>
-            </div>
-          </div>
+        <CardHeader>
+          <CardTitle className="text-lg">Hình ảnh</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <ImageUploadMulti
+            value={formData.gallery_images}
+            existingUrls={formData.existing_gallery_urls}
+            onChange={handleGalleryChange}
+          />
         </CardContent>
       </Card>
 
