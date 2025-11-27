@@ -1,4 +1,4 @@
-import { Filter, OptionalId, UpdateFilter } from 'mongodb';
+import { Filter, OptionalId, OptionalUnlessRequiredId, UpdateFilter } from 'mongodb';
 import { getCollection } from './mongodb';
 
 /**
@@ -45,10 +45,10 @@ export async function findOneDocument<T extends Document>(
  */
 export async function insertDocument<T extends Document>(
   collectionName: string,
-  document: OptionalId<T>
+  document: OptionalUnlessRequiredId<T>
 ) {
   const collection = await getCollection<T>(collectionName);
-  const result = await collection.insertOne(document as OptionalId<T>);
+  const result = await collection.insertOne(document);
   return result;
 }
 
@@ -57,10 +57,10 @@ export async function insertDocument<T extends Document>(
  */
 export async function insertDocuments<T extends Document>(
   collectionName: string,
-  documents: OptionalId<T>[]
+  documents: OptionalUnlessRequiredId<T>[]
 ) {
   const collection = await getCollection<T>(collectionName);
-  const result = await collection.insertMany(documents as OptionalId<T>[]);
+  const result = await collection.insertMany(documents);
   return result;
 }
 
