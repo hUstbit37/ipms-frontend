@@ -14,12 +14,17 @@ import { Textarea } from "@/components/ui/textarea"
 import ImageUploadMulti from "@/components/custom/image/image-upload-multi"
 import MultiSelect from "@/components/custom/select/multi-select"
 import InputError from "@/components/custom/input-error"
-import { Loader2 } from "lucide-react"
+import { Loader2, Search, X } from "lucide-react"
+import NiceClassificationSearch from "@/components/custom/nice-classification-search"
+import ViennaClassificationSearch from "@/components/custom/vienna-classification-search"
+import { Badge } from "@/components/ui/badge"
 
 export default function CreateTrademarkPage() {
   const { setBreadcrumbs } = useBreadcrumbs()
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [errors, setErrors] = useState<Record<string, string>>({})
+  const [showNiceSearch, setShowNiceSearch] = useState(false)
+  const [showViennaSearch, setShowViennaSearch] = useState(false)
   
   useEffect(() => {
     setBreadcrumbs([
@@ -77,6 +82,28 @@ export default function CreateTrademarkPage() {
     related_products: [] as string[],
     // Ghi chú
     notes: '',
+    // Phân loại Nice & Vienna
+    nice_classifications: [] as Array<{
+      id: string
+      classNumber: number
+      classCode: string
+      description: string
+      descriptionEn?: string
+      customDescription?: string
+    }>,
+    vienna_classifications: [] as Array<{
+      _id: string
+      category: number
+      category_desc_vi: string
+      category_desc_en: string
+      division: string
+      division_desc_vi: string
+      division_desc_en: string
+      section: string
+      section_desc_vi: string
+      section_desc_en: string
+    }>,
+    goods_services: '',
     // Checkbox
     continue_adding: false,
     gallery_images: [] as File[],
@@ -227,6 +254,92 @@ export default function CreateTrademarkPage() {
     }))
   }, [setFormData])
 
+  const handleNiceClassificationSelect = (selected: Array<{
+    id: string
+    classNumber: number
+    classCode: string
+    description: string
+    descriptionEn?: string
+  }>) => {
+    setFormData(prev => ({ ...prev, nice_classifications: selected }))
+  }
+
+  const removeNiceClassification = (id: string) => {
+    setFormData(prev => ({
+      ...prev,
+      nice_classifications: prev.nice_classifications.filter(item => item.id !== id)
+    }))
+  }
+
+  const updateNiceCustomDescription = (id: string, customDescription: string) => {
+    setFormData(prev => ({
+      ...prev,
+      nice_classifications: prev.nice_classifications.map(item =>
+        item.id === id ? { ...item, customDescription } : item
+      )
+    }))
+  }
+
+  const handleViennaClassificationSelect = (selected: Array<{
+    _id: string
+    category: number
+    category_desc_vi: string
+    category_desc_en: string
+    division: string
+    division_desc_vi: string
+    division_desc_en: string
+    section: string
+    section_desc_vi: string
+    section_desc_en: string
+  }>) => {
+    setFormData(prev => ({ ...prev, vienna_classifications: selected }))
+  }
+
+  const removeViennaClassification = (id: string) => {
+    setFormData(prev => ({
+      ...prev,
+      vienna_classifications: prev.vienna_classifications.filter(item => item._id !== id)
+    }))
+  }
+
+  // Auto-generate goods_services when nice_classifications changes
+  useEffect(() => {
+    if (formData.nice_classifications.length === 0) {
+      setFormData(prev => ({ ...prev, goods_services: '' }))
+      return
+    }
+
+    // Group by classNumber
+    const grouped = formData.nice_classifications.reduce((acc, item) => {
+      if (!acc[item.classNumber]) {
+        acc[item.classNumber] = []
+      }
+      acc[item.classNumber].push(item)
+      return acc
+    }, {} as Record<number, typeof formData.nice_classifications>)
+
+    // Sort groups by classNumber and generate description
+    const sortedGroups = Object.keys(grouped)
+      .map(Number)
+      .sort((a, b) => a - b)
+
+    const descriptions = sortedGroups.map(classNumber => {
+      const items = grouped[classNumber]
+      // Sort items by classCode (convert to string for comparison)
+      items.sort((a, b) => String(a.classCode).localeCompare(String(b.classCode)))
+      
+      // Use customDescription if available, otherwise use default description
+      const itemDescriptions = items.map(item => 
+        item.customDescription?.trim() || item.description
+      ).join('; ')
+      
+      return `Nhóm ${classNumber}: ${itemDescriptions}.`
+    })
+
+    const generatedDescription = descriptions.join('\n')
+    setFormData(prev => ({ ...prev, goods_services: generatedDescription }))
+  }, [formData.nice_classifications])
+
   const handleSubmit = async () => {
     // Reset errors
     setErrors({})
@@ -363,6 +476,9 @@ export default function CreateTrademarkPage() {
             file_type: '',
             related_products: [],
             notes: '',
+            nice_classifications: [],
+            vienna_classifications: [],
+            goods_services: '',
             continue_adding: formData.continue_adding,
             gallery_images: [],
             existing_gallery_urls: [],
@@ -624,6 +740,7 @@ export default function CreateTrademarkPage() {
         </CardContent>
       </Card>
 
+
       {/* Trạng thái */}
       <Card>
         <CardContent>
@@ -688,6 +805,197 @@ export default function CreateTrademarkPage() {
           </div>
         </CardContent>
       </Card>
+
+      {/* Phân loại Nice & Vienna */}
+      <Card>
+        <CardContent>
+          <div className="space-y-4">
+            <h3 className="text-lg font-semibold mb-4">Phân loại Nice & Vienna</h3>
+            
+            {/* Nice Classification */}
+            <div>
+              <div className="flex items-center justify-between mb-2">
+                <Label>Phân loại Nice</Label>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setShowNiceSearch(true)}
+                >
+                  <Search className="mr-2 h-4 w-4" />
+                  Tìm kiếm phân loại Nice
+                </Button>
+              </div>
+              
+              {formData.nice_classifications.length > 0 ? (
+                <div className="space-y-2">
+                  <div className="border rounded-lg overflow-hidden">
+                    <table className="w-full">
+                      <thead className="bg-muted">
+                        <tr>
+                          <th className="text-left p-2 font-semibold text-sm w-[150px]">Mã nhóm</th>
+                          <th className="text-left p-2 font-semibold text-sm">Tên hàng hóa mặc định</th>
+                          <th className="text-left p-2 font-semibold text-sm">Tên hàng hóa sửa đổi</th>
+                          <th className="text-center p-2 font-semibold text-sm w-[80px]">Xóa</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y">
+                        {formData.nice_classifications.map((item, index) => (
+                          <tr key={item.id} className="hover:bg-muted/50">
+                            <td className="p-2">
+                              <span className="font-semibold text-sm">
+                                {item.classCode}
+                              </span>
+                            </td>
+                            <td className="p-2">
+                              <span className="text-sm text-muted-foreground">
+                                {item.description}
+                              </span>
+                            </td>
+                            <td className="p-2 text-left">
+                              <Input
+                                placeholder="Nhập tên hàng hóa sửa đổi (nếu có)"
+                                className="text-sm"
+                                value={item.customDescription || ''}
+                                onChange={(e) => updateNiceCustomDescription(item.id, e.target.value)}
+                              />
+                            </td>
+                            <td className="p-2 text-center">
+                              <Button
+                                type="button"
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => removeNiceClassification(item.id)}
+                                className="hover:bg-destructive/20 hover:text-destructive"
+                              >
+                                <X className="h-4 w-4" />
+                              </Button>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                  <p className="text-sm text-muted-foreground">
+                    Đã chọn {formData.nice_classifications.length} phân loại
+                  </p>
+                </div>
+              ) : (
+                <div className="border-2 border-dashed rounded-lg p-6 text-center">
+                  <p className="text-sm text-muted-foreground mb-2">
+                    Chưa có phân loại Nice nào được chọn
+                  </p>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setShowNiceSearch(true)}
+                  >
+                    <Search className="mr-2 h-4 w-4" />
+                    Thêm phân loại
+                  </Button>
+                </div>
+              )}
+            </div>
+            {/* Goods and Services Description */}
+            <div>
+              <Label htmlFor="goods_services">Mô tả hàng hóa/dịch vụ (Tự động tạo từ phân loại Nice)</Label>
+              <Textarea
+                id="goods_services"
+                placeholder="Mô tả sẽ được tạo tự động khi bạn chọn phân loại Nice..."
+                value={formData.goods_services}
+                readOnly
+                className="bg-muted"
+                rows={6}
+              />
+              <p className="text-xs text-muted-foreground mt-1">
+                Nội dung được tạo tự động từ các phân loại Nice đã chọn. Bạn có thể sửa tên hàng hóa trong bảng phía trên.
+              </p>
+            </div>
+
+            {/* Vienna Classification */}
+            <div>
+              <div className="flex items-center justify-between mb-2">
+                <Label>Phân loại Vienna</Label>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setShowViennaSearch(true)}
+                >
+                  <Search className="mr-2 h-4 w-4" />
+                  Tìm kiếm phân loại Vienna
+                </Button>
+              </div>
+              
+              {formData.vienna_classifications.length > 0 ? (
+                <div className="space-y-2">
+                  <div className="flex flex-wrap gap-2">
+                    {formData.vienna_classifications.map((item) => (
+                      <Badge
+                        key={item._id}
+                        variant="secondary"
+                        className="px-3 py-1.5 text-sm flex items-center gap-2"
+                      >
+                        <span className="font-semibold">
+                          {item.section}
+                        </span>
+                        <span className="text-muted-foreground">-</span>
+                        <span className="max-w-[300px] truncate">
+                          {item.section_desc_vi}
+                        </span>
+                        <button
+                          type="button"
+                          onClick={() => removeViennaClassification(item._id)}
+                          className="ml-1 hover:bg-destructive/20 rounded-full p-0.5"
+                        >
+                          <X className="h-3 w-3" />
+                        </button>
+                      </Badge>
+                    ))}
+                  </div>
+                  <p className="text-sm text-muted-foreground">
+                    Đã chọn {formData.vienna_classifications.length} phân loại
+                  </p>
+                </div>
+              ) : (
+                <div className="border-2 border-dashed rounded-lg p-6 text-center">
+                  <p className="text-sm text-muted-foreground mb-2">
+                    Chưa có phân loại Vienna nào được chọn
+                  </p>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setShowViennaSearch(true)}
+                  >
+                    <Search className="mr-2 h-4 w-4" />
+                    Thêm phân loại
+                  </Button>
+                </div>
+              )}
+            </div>
+
+            
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Nice Classification Search Modal */}
+      <NiceClassificationSearch
+        open={showNiceSearch}
+        onOpenChange={setShowNiceSearch}
+        onSelect={handleNiceClassificationSelect}
+        selectedItems={formData.nice_classifications}
+      />
+
+      {/* Vienna Classification Search Modal */}
+      <ViennaClassificationSearch
+        open={showViennaSearch}
+        onOpenChange={setShowViennaSearch}
+        onSelect={handleViennaClassificationSelect}
+        selectedItems={formData.vienna_classifications}
+      />
 
       {/* IP Family */}
       {/* <Card>

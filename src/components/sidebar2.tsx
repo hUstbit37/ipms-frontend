@@ -24,6 +24,7 @@ import {
 	MapPin,
 	Copyright,
 	Globe,
+	Search,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useSidebar } from "@/components/sidebar-context"
@@ -36,6 +37,12 @@ const sidebarGroups = [
 				title: "Dashboard",
 				href: "/",
 				icon: LayoutDashboard,
+				badge: null,
+			},
+			{
+				title: "Tra cứu IP",
+				href: "/search/trademark",
+				icon: Search,
 				badge: null,
 			},
 		],

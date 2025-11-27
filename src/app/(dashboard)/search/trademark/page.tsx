@@ -74,27 +74,6 @@ type Trademark = {
   file_type: string
   related_products: string[]
   notes: string
-  nice_classifications: Array<{
-    id: string
-    classNumber: number
-    classCode: string
-    description: string
-    descriptionEn?: string
-    customDescription?: string
-  }>
-  vienna_classifications: Array<{
-    _id: string
-    category: number
-    category_desc_vi: string
-    category_desc_en: string
-    division: string
-    division_desc_vi: string
-    division_desc_en: string
-    section: string
-    section_desc_vi: string
-    section_desc_en: string
-  }>
-  goods_services: string
   gallery_images: string[]
   created_at: string
   updated_at: string
@@ -123,8 +102,8 @@ export default function TrademarksPage() {
   useEffect(() => {
     setBreadcrumbs([
       { label: "Dashboard", href: "/" },
-      { label: "Nhãn hiệu", href: "/trademarks" },
-      { label: "Danh sách" }
+      { label: "Tra cứu", href: "/search/trademark" },
+      { label: "Nhãn hiệu" }
     ])
   }, [setBreadcrumbs])
 
@@ -189,34 +168,27 @@ export default function TrademarksPage() {
     { label: 'Chưa tra cứu', value: 'not_searched' },
   ]
 
-  const niceClassOptions = [
-    { label: 'Lớp 1', value: '1' },
-    { label: 'Lớp 2', value: '2' },
-    { label: 'Lớp 3', value: '3' },
-    { label: 'Lớp 9', value: '9' },
-    { label: 'Lớp 25', value: '25' },
-    { label: 'Lớp 35', value: '35' },
-  ]
+  const niceClassOptions = Array.from({ length: 45 }, (_, i) => ({
+    label: `Lớp ${i + 1}`,
+    value: `${i + 1}`
+  }))
 
-  const countryOptions = [
-    { label: 'Việt Nam', value: 'VN' },
-    { label: 'Hoa Kỳ', value: 'US' },
-    { label: 'Nhật Bản', value: 'JP' },
-    { label: 'Hàn Quốc', value: 'KR' },
-    { label: 'Trung Quốc', value: 'CN' },
-    { label: 'Đức', value: 'DE' },
-    { label: 'Pháp', value: 'FR' },
-    { label: 'Anh', value: 'GB' },
-    { label: 'Thái Lan', value: 'TH' },
-    { label: 'Singapore', value: 'SG' },
-  ]
+  const [countryOptions, setCountryOptions] = useState<{ label: string; value: string }[]>([])
+
+  useEffect(() => {
+    fetch('/api/mongodb/countries')
+      .then(res => res.json())
+      .then(result => {
+        if (result.success) {
+          setCountryOptions(result.data)
+        }
+      })
+      .catch(err => console.error('Error loading countries:', err))
+  }, [])
 
   const [data, setData] = useState({
     // Thông tin cơ bản
     name: '',
-    product: '',
-    description: '',
-    note: '',
     // Số đơn
     application_number: '',
     certificate_number: '',
@@ -234,16 +206,14 @@ export default function TrademarksPage() {
     applicant: '',
     representative: '',
     // Trạng thái
-    status: '',
-    commercial_status: '',
-    search_status: '',
-    // Phân loại
     nice_class: '',
     goods_services: '',
     vienna_class: '',
     // Quốc gia
     origin_country: '',
     country: '',
+    page: 1,
+    pag_size: 50
   })
 
   const [showAdvancedSearch, setShowAdvancedSearch] = useState(false)
@@ -335,16 +305,6 @@ export default function TrademarksPage() {
                       placeholder="Tên nhãn hiệu..."
                       value={data.name}
                       onChange={(e) => setData({ ...data, name: e.target.value })}
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="product">Sản phẩm</Label>
-                    <Input
-                      id="product"
-                      type="text"
-                      placeholder="Sản phẩm..."
-                      value={data.product}
-                      onChange={(e) => setData({ ...data, product: e.target.value })}
                     />
                   </div>
                   <div>
@@ -551,80 +511,6 @@ export default function TrademarksPage() {
                 </div>
               </div>
 
-              {/* Status - Trạng thái */}
-              <div className="border rounded-lg p-4">
-                <h3 className="text-sm font-semibold mb-3 text-primary">Trạng thái (Status)</h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3">
-                  <div>
-                    <Label htmlFor="status">Trạng thái pháp lý</Label>
-                    <SingleSelect
-                      instanceId="status-select"
-                      isClearable
-                      options={statusOptions}
-                      value={statusOptions.find(b => b.value === data.status) ? {
-                        value: data.status,
-                        label: statusOptions.find(b => b.value === data.status)?.label || ''
-                      } : null}
-                      onChange={(selected) => setData({
-                        ...data,
-                        status: selected ? selected.value as string : ''
-                      })}
-                      placeholder="Trạng thái pháp lý"
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="commercial_status">Trạng thái thương mại</Label>
-                    <SingleSelect
-                      instanceId="commercial-status-select"
-                      isClearable
-                      options={commercialStatusOptions}
-                      value={commercialStatusOptions.find(b => b.value === data.commercial_status) ? {
-                        value: data.commercial_status,
-                        label: commercialStatusOptions.find(b => b.value === data.commercial_status)?.label || ''
-                      } : null}
-                      onChange={(selected) => setData({
-                        ...data,
-                        commercial_status: selected ? selected.value as string : ''
-                      })}
-                      placeholder="Trạng thái thương mại"
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="search_status">Trạng thái tra cứu</Label>
-                    <SingleSelect
-                      instanceId="search-status-select"
-                      isClearable
-                      options={searchStatusOptions}
-                      value={searchStatusOptions.find(b => b.value === data.search_status) ? {
-                        value: data.search_status,
-                        label: searchStatusOptions.find(b => b.value === data.search_status)?.label || ''
-                      } : null}
-                      onChange={(selected) => setData({
-                        ...data,
-                        search_status: selected ? selected.value as string : ''
-                      })}
-                      placeholder="Trạng thái tra cứu"
-                    />
-                  </div>
-                </div>
-              </div>
-
-              {/* Other - Khác */}
-              <div className="border rounded-lg p-4">
-                <h3 className="text-sm font-semibold mb-3 text-primary">Khác (Other)</h3>
-                <div className="grid grid-cols-1 gap-3">
-                  <div>
-                    <Label htmlFor="note">Ghi chú</Label>
-                    <Input
-                      id="note"
-                      type="text"
-                      placeholder="Ghi chú..."
-                      value={data.note}
-                      onChange={(e) => setData({ ...data, note: e.target.value })}
-                    />
-                  </div>
-                </div>
-              </div>
 
               {/* Action Buttons */}
               <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 border-t pt-3">
@@ -650,48 +536,9 @@ export default function TrademarksPage() {
       {/* Table Card */}
       <Card>
         <CardContent>
-          <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 mb-4">
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="outline" size="default" className="gap-2">
-                  <ChevronDown className="h-4 w-4" />
-                  Thao tác
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="start">
-                <DropdownMenuLabel>Thao tác hàng loạt</DropdownMenuLabel>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem>
-                  <Download className="mr-2 h-4 w-4" />
-                  Xuất dữ liệu
-                </DropdownMenuItem>
-                <DropdownMenuItem>
-                  <Pencil className="mr-2 h-4 w-4" />
-                  Cập nhật hàng loạt
-                </DropdownMenuItem>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem className="text-destructive">
-                  <Trash2 className="mr-2 h-4 w-4" />
-                  Xóa đã chọn
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-            <Button 
-              variant="default" 
-              size="default" 
-              className="gap-2"
-              onClick={() => router.push('/trademarks/create')}
-            >
-              <Plus className="h-4 w-4" />
-              Tạo mới
-            </Button>
-          </div>
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead className="w-[50px]">
-                  <Checkbox />
-                </TableHead>
                 <TableHead className="text-center">Hình ảnh</TableHead>
                 <TableHead>Mã</TableHead>
                 <TableHead>Tên</TableHead>
@@ -731,9 +578,6 @@ export default function TrademarksPage() {
                 currentTrademarks.map((trademark) => (
                 <TableRow key={trademark._id}>
                   <TableCell>
-                    <Checkbox />
-                  </TableCell>
-                  <TableCell>
                     <ImageShowList
                         src={trademark.gallery_images?.[0] || ''} 
                         alt={trademark.name || "Trademark image"}
@@ -756,12 +600,7 @@ export default function TrademarksPage() {
                     {trademark.applicant_name || '-'}
                   </TableCell>
                   <TableCell className="text-sm">
-                    {trademark.nice_classifications && trademark.nice_classifications.length > 0
-                      ? [...new Set(trademark.nice_classifications.map(nc => nc.classNumber))]
-                          .sort((a, b) => a - b)
-                          .join(', ')
-                      : '-'
-                    }
+                    -
                   </TableCell>
                   <TableCell className="text-sm">
                     {trademark.application_number}
