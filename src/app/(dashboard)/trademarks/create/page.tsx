@@ -13,10 +13,13 @@ import { DatePickerSingle } from "@/components/custom/date/date-picker-single"
 import { Textarea } from "@/components/ui/textarea"
 import ImageUploadMulti from "@/components/custom/image/image-upload-multi"
 import MultiSelect from "@/components/custom/select/multi-select"
+import InputError from "@/components/custom/input-error"
+import { Loader2 } from "lucide-react"
 
 export default function CreateTrademarkPage() {
   const { setBreadcrumbs } = useBreadcrumbs()
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [errors, setErrors] = useState<Record<string, string>>({})
   
   useEffect(() => {
     setBreadcrumbs([
@@ -32,6 +35,7 @@ export default function CreateTrademarkPage() {
     name_upper_ascii: '', // Tên không dấu
     trademark_type: '', // Loại nhãn hiệu
     status: '', // Trạng thái pháp lý
+    wipo_status: '', // Trạng thái của cục
     country_code: '', // Mã quốc gia đăng ký
     ip_family: '', // Họ nhãn
     code: '', // Mã số ip cấu trúc TM-họ nhãn-loại nhãn(code của trademark_type)-mã viết tắt của chủ đơn-stt(từ 001)
@@ -224,14 +228,40 @@ export default function CreateTrademarkPage() {
   }, [setFormData])
 
   const handleSubmit = async () => {
+    // Reset errors
+    setErrors({})
+
     // Validate required fields
+    const validationErrors: Record<string, string> = {}
+
     if (!formData.name) {
-      alert('Vui lòng nhập tên nhãn hiệu')
-      return
+      validationErrors.name = 'Tên nhãn hiệu là bắt buộc'
     }
 
     if (!formData.trademark_type) {
-      alert('Vui lòng chọn loại nhãn hiệu')
+      validationErrors.trademark_type = 'Kiểu nhãn hiệu là bắt buộc'
+    }
+
+    if (!formData.ip_family) {
+      validationErrors.ip_family = 'Họ nhãn là bắt buộc'
+    }
+
+    if (!formData.applicant_id) {
+      validationErrors.applicant_id = 'Chủ đơn là bắt buộc'
+    }
+
+    if (!formData.agency_id) {
+      validationErrors.agency_id = 'Đại diện là bắt buộc'
+    }
+
+    if (!formData.country_code) {
+      validationErrors.country_code = 'Quốc gia đăng ký là bắt buộc'
+    }
+
+    // If there are validation errors, show them and stop
+    if (Object.keys(validationErrors).length > 0) {
+      setErrors(validationErrors)
+      // alert('Vui lòng điền đầy đủ thông tin bắt buộc')
       return
     }
 
@@ -300,6 +330,7 @@ export default function CreateTrademarkPage() {
             name_upper_ascii: '',
             trademark_type: '',
             status: '',
+            wipo_status: '',
             country_code: '',
             ip_family: '',
             code: '',
@@ -385,6 +416,7 @@ export default function CreateTrademarkPage() {
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                 />
+                <InputError message={errors?.name} />
               </div>
               {/* <div>
                 <Label htmlFor="name_upper_ascii">
@@ -408,6 +440,7 @@ export default function CreateTrademarkPage() {
                   onChange={(selected) => setFormData({ ...formData, ip_family: selected?.value as string || '' })}
                   placeholder="Chọn họ nhãn"
                 />
+                <InputError message={errors?.ip_family} />
               </div>
               
               <div>
@@ -421,6 +454,7 @@ export default function CreateTrademarkPage() {
                   onChange={(selected) => setFormData({ ...formData, trademark_type: selected?.value as string || '' })}
                   placeholder="Chọn kiểu nhãn hiệu"
                 />
+                <InputError message={errors?.trademark_type} />
               </div>
               {/* <div>
                 <Label htmlFor="legal_status">
@@ -478,6 +512,7 @@ export default function CreateTrademarkPage() {
                   onChange={(selected) => setFormData({ ...formData, applicant_id: selected?.value as string || '' })}
                   placeholder="Chọn chủ đơn"
                 />
+                <InputError message={errors?.applicant_id} />
               </div>
               <div>
                 <Label htmlFor="agency">
@@ -490,6 +525,7 @@ export default function CreateTrademarkPage() {
                   onChange={(selected) => setFormData({ ...formData, agency_id: selected?.value as string || '' })}
                   placeholder="Chọn đại diện"
                 />
+                <InputError message={errors?.agency_id} />
               </div>
             </div>
             <div>
@@ -523,6 +559,7 @@ export default function CreateTrademarkPage() {
                   onChange={(selected) => setFormData({ ...formData, country_code: selected?.value as string || '' })}
                   placeholder="Chọn quốc gia"
                 />
+                <InputError message={errors?.country_code} />
               </div>
               <div>
                 <Label htmlFor="application_number">Số đơn</Label>
@@ -595,16 +632,28 @@ export default function CreateTrademarkPage() {
             <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
               <div>
                 <Label htmlFor="status">
-                  Trạng thái
+                  Trạng thái nội bộ
                 </Label>
                 <SingleSelect
                   instanceId="status"
                   options={statusOptions}
                   value={statusOptions.find(o => o.value === formData.status) || null}
                   onChange={(selected) => setFormData({ ...formData, status: selected?.value as string || '' })}
-                  placeholder="Chọn trạng thái pháp lý"
+                  placeholder="Chọn trạng thái"
                 />
               </div>
+              <div>
+                <Label htmlFor="wipo_status">
+                  Trạng thái của cục SHTT
+                </Label>
+                <SingleSelect
+                  instanceId="wipo_status"
+                  options={[]}
+                  onChange={(selected) => setFormData({ ...formData, wipo_status: selected?.value as string || '' })}
+                  placeholder="Chọn trạng thái"
+                />
+              </div>
+              
               <div>
                 <Label htmlFor="commercial_status">
                   Tình trạng thương mại
@@ -836,10 +885,18 @@ export default function CreateTrademarkPage() {
             
             <div>
               <Label htmlFor="related_products">Link sản phần</Label>
-              <SingleSelect
-                instanceId="related-products"
-                options={relatedProductOptions}
-                placeholder="Chọn sản phẩm liên quan"
+              <MultiSelect
+              instanceId="related-products"
+              options={relatedProductOptions}
+              value={(formData.related_products || []).map((value: string) => {
+                const product = relatedProductOptions.find(p => p.value === value.toString());
+                return product ? { value: product.value, label: product.label } : { value: value, label: value };
+              })}
+              onChange={(selectedOptions) => {
+                const selectedValues = selectedOptions.map(option => String(option.value));
+                setFormData({ ...formData, related_products: selectedValues });
+              }}
+              placeholder="Chọn sản phẩm liên quan"
               />
             </div>
           </div>
@@ -859,7 +916,7 @@ export default function CreateTrademarkPage() {
           </Label>
         </div>
         <div className="flex gap-3">
-          <Button variant="outline" size="default">
+          <Button variant="outline" size="default" disabled={isSubmitting}>
             Hủy
           </Button>
           <Button 
@@ -868,6 +925,7 @@ export default function CreateTrademarkPage() {
             onClick={handleSubmit}
             disabled={isSubmitting}
           >
+            {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
             {isSubmitting ? 'Đang xử lý...' : 'Thêm mới'}
           </Button>
         </div>
