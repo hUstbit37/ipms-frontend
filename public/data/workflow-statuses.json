@@ -1,0 +1,18 @@
+[
+  {
+    "label": "Nháp",
+    "value": "draft"
+  },
+  {
+    "label": "Chờ duyệt",
+    "value": "pending_review"
+  },
+  {
+    "label": "Đã duyệt",
+    "value": "approved"
+  },
+  {
+    "label": "Từ chối",
+    "value": "rejected"
+  }
+]

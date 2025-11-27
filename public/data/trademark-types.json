@@ -1,0 +1,77 @@
+[
+  {
+    "label": "Chữ (Word)",
+    "value": "word",
+    "code": "W"
+  },
+  {
+    "label": "Kết hợp (Combined)",
+    "value": "combined",
+    "code": "CB"
+  },
+  {
+    "label": "Không xác định (Undefined)",
+    "value": "undefined",
+    "code": "UD"
+  },
+  {
+    "label": "Hình tượng (Figurative)",
+    "value": "figurative",
+    "code": "FG"
+  },
+  {
+    "label": "Khác (Other)",
+    "value": "other",
+    "code": "OT"
+  },
+  {
+    "label": "Ký tự phong cách hóa (Stylized characters)",
+    "value": "stylized_characters",
+    "code": "SC"
+  },
+  {
+    "label": "3D (3D)",
+    "value": "3d",
+    "code": "3D"
+  },
+  {
+    "label": "Màu sắc (Colour)",
+    "value": "colour",
+    "code": "CL"
+  },
+  {
+    "label": "Ảnh ba chiều (Hologram)",
+    "value": "hologram",
+    "code": "HG"
+  },
+  {
+    "label": "Âm thanh (Sound)",
+    "value": "sound",
+    "code": "SD"
+  },
+  {
+    "label": "Vị trí (Position)",
+    "value": "position",
+    "code": "PS"
+  },
+  {
+    "label": "Chuyển động (Motion)",
+    "value": "motion",
+    "code": "MT"
+  },
+  {
+    "label": "Khứu giác (Olfactory)",
+    "value": "olfactory",
+    "code": "OF"
+  },
+  {
+    "label": "Hình dạng 3D (3D shape)",
+    "value": "3d_shape",
+    "code": "3S"
+  },
+  {
+    "label": "Mẫu hoa văn (Pattern)",
+    "value": "pattern",
+    "code": "PT"
+  }
+]

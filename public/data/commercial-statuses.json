@@ -1,0 +1,34 @@
+[
+  {
+    "label": "Đang sử dụng (In Use)",
+    "value": "in_use"
+  },
+  {
+    "label": "Cấp phép (Licensed)",
+    "value": "licensed"
+  },
+  {
+    "label": "Franchise (Franchised)",
+    "value": "franchised"
+  },
+  {
+    "label": "Đã nhượng quyền (franchise)",
+    "value": "franchise"
+  },
+  {
+    "label": "Chưa khai thác (Unused)",
+    "value": "unused"
+  },
+  {
+    "label": "Chuyển nhượng (Assigned)",
+    "value": "assigned"
+  },
+  {
+    "label": "Đang đàm phán (Negotiating)",
+    "value": "negotiating"
+  },
+  {
+    "label": "Đã ngưng khai thác (No Longer in Use)",
+    "value": "discontinued"
+  }
+]

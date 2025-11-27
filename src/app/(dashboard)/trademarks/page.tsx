@@ -35,29 +35,57 @@ import { se } from "date-fns/locale"
 import ImageShowList from "@/components/custom/image/image-show-list"
 
 type Trademark = {
-  id: number
+  _id: string
   code: string
-  logo: string
   name: string
-  origin_country: string // Quốc gia đơn gốc
-  country: string // Quốc gia bảo hộ (chính là quốc gia trong mỗi bản ghi)
-  applicant: string // Chủ đơn
+  name_upper_ascii: string
+  trademark_type: string
+  status: string
+  country_code: string
+  ip_family: string
   application_number: string
   application_date: string
   certificate_number: string
-  status: string //trạng thái pháp lý
-  agency: string // Đại diện
-  commercial_status: string //trạng thái thương mại
-  nice_class: string
-  vienna_class: string
+  certificate_date: string
+  expiry_date: string
+  publication_date: string
+  declaration_date: string
+  applicant_id: string
+  agency_id: string
+  applicant_name?: string // Populated from companies
+  agency_name?: string // Populated from agencies
+  authors: string
+  workflow_status: string
+  commercial_statuses: string[]
+  search_status: string
+  filing_number_1: string
+  filing_date_1: string
+  filing_country_1: string
+  filing_number_2: string
+  filing_date_2: string
+  filing_country_2: string
+  renewal_date_1: string
+  renewal_date_2: string
+  renewal_fee_due_1: string
+  renewal_fee_due_2: string
+  folder_name: string
+  folder_path: string
+  file_format: string
+  file_type: string
+  related_products: string[]
+  notes: string
+  gallery_images: string[]
+  created_at: string
+  updated_at: string
 }
 
 const fetchTrademarks = async (): Promise<Trademark[]> => {
-  const response = await fetch('/data/trademarks.json')
+  const response = await fetch('/api/trademarks/list')
   if (!response.ok) {
     throw new Error('Failed to fetch trademarks')
   }
-  return response.json()
+  const result = await response.json()
+  return result.success ? result.data : []
 }
 
 export default function TrademarksPage() {
@@ -680,13 +708,13 @@ export default function TrademarksPage() {
                 </TableRow>
               ) : (
                 currentTrademarks.map((trademark) => (
-                <TableRow key={trademark.id}>
+                <TableRow key={trademark._id}>
                   <TableCell>
                     <Checkbox />
                   </TableCell>
                   <TableCell>
                     <ImageShowList
-                        src={trademark.logo} 
+                        src={trademark.gallery_images?.[0] || ''} 
                         alt={trademark.name || "Trademark image"}
                         size="md"
                     />
@@ -698,34 +726,34 @@ export default function TrademarksPage() {
                     {trademark.name}
                   </TableCell>
                   <TableCell className="text-sm">
-                    {trademark.origin_country}
+                    {trademark.country_code || '-'}
                   </TableCell>
                   <TableCell className="text-sm">
-                    {trademark.country}
+                    {trademark.country_code || '-'}
                   </TableCell>
                   <TableCell className="text-sm">
-                    {trademark.applicant}
+                    {trademark.applicant_name || '-'}
                   </TableCell>
                   <TableCell className="text-sm">
-                    {trademark.nice_class}
+                    -
                   </TableCell>
                   <TableCell className="text-sm">
                     {trademark.application_number}
                   </TableCell>
                   <TableCell className="text-sm">
-                    {trademark.application_date}
+                    {trademark.application_date ? new Date(trademark.application_date).toLocaleDateString('vi-VN') : '-'}
                   </TableCell>
                   <TableCell className="text-sm">
                     {trademark.certificate_number || '-'}
                   </TableCell>
                   <TableCell className="text-sm">
-                    {trademark.agency}
+                    {trademark.agency_name || '-'}
                   </TableCell>
                   <TableCell>
-                    <Badge variant="secondary">{trademark.status}</Badge>
+                    <Badge variant="secondary">{trademark.status || '-'}</Badge>
                   </TableCell>
                   <TableCell>
-                    <Badge variant="outline">{trademark.commercial_status}</Badge>
+                    <Badge variant="outline">{trademark.commercial_statuses?.[0] || '-'}</Badge>
                   </TableCell>
                   <TableCell className="text-right">
                     <DropdownMenu>

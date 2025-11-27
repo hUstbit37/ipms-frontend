@@ -1,0 +1,10 @@
+[
+  {
+    "label": "Chưa tra cứu",
+    "value": "not_searched"
+  },
+  {
+    "label": "Đã tra cứu",
+    "value": "searched"
+  }
+]

@@ -73,11 +73,11 @@ const sidebarGroups = [
 				href: "/copyrights",
 				icon: Copyright,
 			},
-			{
-				title: "Tên miền",
-				href: "/domains",
-				icon: Globe,
-			},
+			// {
+			// 	title: "Tên miền",
+			// 	href: "/domains",
+			// 	icon: Globe,
+			// },
 		],
 	},
 ];

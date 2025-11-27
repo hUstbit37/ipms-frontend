@@ -1,0 +1,86 @@
+[
+  {
+    "label": "Đang tra cứu",
+    "value": "searching"
+  },
+  {
+    "label": "Đã nộp đơn",
+    "value": "filed"
+  },
+  {
+    "label": "Từ chối hình thức",
+    "value": "formal_refused"
+  },
+  {
+    "label": "Giải trình hình thức",
+    "value": "formal_response"
+  },
+  {
+    "label": "Đơn hợp lệ",
+    "value": "formally_accepted"
+  },
+  {
+    "label": "Bị phản đối",
+    "value": "opposed"
+  },
+  {
+    "label": "Từ chối nội dung",
+    "value": "content_refused"
+  },
+  {
+    "label": "Giải trình nội dung",
+    "value": "content_response"
+  },
+  {
+    "label": "Công bố",
+    "value": "published"
+  },
+  {
+    "label": "Đóng phí cấp bằng",
+    "value": "grant_fee_paid"
+  },
+  {
+    "label": "Cấp bằng",
+    "value": "granted"
+  },
+  {
+    "label": "Từ chối cấp bằng",
+    "value": "grant_refused"
+  },
+  {
+    "label": "Khiếu nại/ Khởi kiện QĐHC",
+    "value": "appealed"
+  },
+  {
+    "label": "Chuyển nhượng đơn",
+    "value": "app_transferred"
+  },
+  {
+    "label": "Chuyển nhượng bằng",
+    "value": "right_transferred"
+  },
+  {
+    "label": "Rút đơn",
+    "value": "withdrawn"
+  },
+  {
+    "label": "Đang sửa đơn",
+    "value": "app_under_amend"
+  },
+  {
+    "label": "Đang sửa bằng",
+    "value": "cert_under_amend"
+  },
+  {
+    "label": "Đã gia hạn",
+    "value": "renewed"
+  },
+  {
+    "label": "Hết hiệu lực",
+    "value": "expired"
+  },
+  {
+    "label": "Từ bỏ đăng ký",
+    "value": "abandoned"
+  }
+]
