@@ -1,9 +1,49 @@
-import { Filter, OptionalId, OptionalUnlessRequiredId, UpdateFilter } from 'mongodb';
+import { Filter, OptionalId, OptionalUnlessRequiredId, UpdateFilter, ObjectId } from 'mongodb';
 import { getCollection } from './mongodb';
 
 /**
  * Generic CRUD operations for MongoDB collections
  */
+
+/**
+ * Get a single document by ID
+ */
+export async function getDocument<T extends Document>(
+  collectionName: string,
+  id: string
+) {
+  const collection = await getCollection<T>(collectionName);
+  return collection.findOne({ _id: new ObjectId(id) } as Filter<T>);
+}
+
+/**
+ * Update a document by ID
+ */
+export async function updateDocumentById<T extends Document>(
+  collectionName: string,
+  id: string,
+  update: Partial<T>
+) {
+  const collection = await getCollection<T>(collectionName);
+  const result = await collection.findOneAndUpdate(
+    { _id: new ObjectId(id) } as Filter<T>,
+    { $set: update } as UpdateFilter<T>,
+    { returnDocument: 'after' }
+  );
+  return result;
+}
+
+/**
+ * Delete a document by ID
+ */
+export async function deleteDocumentById<T extends Document>(
+  collectionName: string,
+  id: string
+) {
+  const collection = await getCollection<T>(collectionName);
+  const result = await collection.deleteOne({ _id: new ObjectId(id) } as Filter<T>);
+  return result.deletedCount > 0;
+}
 
 /**
  * Find documents in a collection

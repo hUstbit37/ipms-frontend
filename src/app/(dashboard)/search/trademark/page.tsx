@@ -189,6 +189,7 @@ export default function TrademarksPage() {
   const [data, setData] = useState({
     // Thông tin cơ bản
     name: '',
+    description: '',
     // Số đơn
     application_number: '',
     certificate_number: '',
